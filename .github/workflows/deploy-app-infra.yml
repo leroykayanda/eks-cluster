@@ -1,0 +1,44 @@
+name: Deploy-Infra
+
+on:
+  workflow_call:
+    inputs:
+      terraform_workspace:
+        required: true
+        type: string
+
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TF_WORKSPACE: ${{ inputs.terraform_workspace }}
+    defaults:
+      run:
+        working-directory: demo-app/terraform
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_TOKEN }}
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Apply
+        id: plan
+        run: terraform apply -auto-approve
+        continue-on-error: false
