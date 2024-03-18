@@ -11,6 +11,9 @@ namespace: dev-demo-app
 
 patches:
   - path: deployment-patch.yaml
+  - path: ExternalSecret-patch.yaml
+  - path: lb-patch.yaml
+  - path: hpa-patch.yaml
   - target:
       kind: Namespace
       name: default

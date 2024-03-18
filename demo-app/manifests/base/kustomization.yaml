@@ -3,3 +3,8 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - namespace.yaml
+  - service.yaml
+  - SecretStore.yaml
+  - ExternalSecret.yaml
+  - lb_controller.yaml
+  - hpa.yaml

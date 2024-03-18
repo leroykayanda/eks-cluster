@@ -28,10 +28,18 @@ variable "sns_topic" {
 #vpc
 variable "vpc_id" {
   type = map(string)
+  default = {
+    "dev"  = "vpc-a55451c3"
+    "prod" = ""
+  }
 }
 
 variable "private_subnets" {
   type = map(list(string))
+  default = {
+    "dev"  = ["subnet-39eb5b63", "subnet-9781f6f1"],
+    "prod" = []
+  }
 }
 
 variable "public_subnets" {
@@ -83,19 +91,28 @@ variable "access_entries" {
   description = "Map of access entries for the EKS cluster"
 }
 
-variable "load_balancer_attributes" {
-  type    = string
-  default = "access_logs.s3.enabled=true,access_logs.s3.bucket=dev-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=900"
+variable "argo_load_balancer_attributes" {
+  type = map(string)
+  default = {
+    "dev"  = "access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300"
+    "prod" = ""
+  }
 }
 
-variable "target_group_attributes" {
-  type    = string
-  default = "deregistration_delay.timeout_seconds=5"
+variable "argo_target_group_attributes" {
+  type = map(string)
+  default = {
+    "dev"  = "deregistration_delay.timeout_seconds=5"
+    "prod" = ""
+  }
 }
 
-variable "tags" {
-  type    = string
-  default = "Environment=dev,Team=devops"
+variable "argo_tags" {
+  type = map(string)
+  default = {
+    "dev"  = "Environment=dev,Team=devops"
+    "prod" = ""
+  }
 }
 
 variable "company_name" {
@@ -108,8 +125,59 @@ variable "company_name" {
 
 variable "zone_id" {
   type    = string
-  default = "Z0052717WJUA8A2U4AH1"
+  default = "Z10421303ISFAWMPOGQET"
 }
+
+variable "argo_subnets" {
+  type = map(string)
+  default = {
+    "dev"  = "subnet-39eb5b63, subnet-9781f6f1"
+    "prod" = ""
+  }
+}
+
+variable "certificate_arn" {
+  type    = string
+  default = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
+}
+
+variable "argo_domain_name" {
+  type = map(string)
+  default = {
+    "dev"  = "dev-argo.rentrahisi.co.ke"
+    "prod" = ""
+  }
+}
+
+variable "argo_lb_dns_name" {
+  type = map(string)
+  default = {
+    "dev"  = "dev-eks-cluster-1403757379.eu-west-1.elb.amazonaws.com"
+    "prod" = ""
+  }
+}
+
+variable "argo_lb_zone_id" {
+  type = map(string)
+  default = {
+    "dev"  = "Z32O12XQLNTSW2"
+    "prod" = ""
+  }
+}
+
+variable "argo_ssh_private_key" {
+  description = "The SSH private key"
+  type        = string
+}
+
+variable "argo_repo" {
+  type    = string
+  default = "git@github.com:leroykayanda"
+}
+
+# variable "argo_slack_token" {
+#   type = string
+# }
 
 variable "argocd_image_updater_values" {
   type = map(list(string))
@@ -136,60 +204,4 @@ EOF
     "prod" = [
     ]
   }
-}
-
-variable "argo_subnets" {
-  type = map(string)
-  default = {
-    "dev"  = "subnet-0a927928904638826 , subnet-0caebfd9ff05daff8"
-    "prod" = ""
-  }
-}
-
-variable "certificate_arn" {
-  type    = string
-  default = ""
-}
-
-variable "argo_domain_name" {
-  type = map(string)
-  default = {
-    "dev"  = ""
-    "prod" = ""
-  }
-}
-
-variable "argo_lb_dns_name" {
-  type = map(string)
-  default = {
-    "dev"  = ""
-    "prod" = ""
-  }
-}
-
-variable "argo_lb_zone_id" {
-  type = map(string)
-  default = {
-    "dev"  = ""
-    "prod" = ""
-  }
-}
-
-# variable "argo_ssh_private_key" {
-#   description = "The SSH private key"
-#   type        = string
-# }
-
-variable "argo_repo" {
-  type    = string
-  default = ""
-}
-
-# variable "argo_slack_token" {
-#   type = string
-# }
-
-variable "argo_elb_timeout" {
-  type    = number
-  default = 900
 }

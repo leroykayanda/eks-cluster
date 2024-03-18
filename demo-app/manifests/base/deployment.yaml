@@ -13,6 +13,7 @@ spec:
       labels:
         app: demo-app
     spec:
+      serviceAccountName: demo-app
       containers:
         - name: demo-app
           ports:
@@ -25,3 +26,6 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 2
+          envFrom:
+            - secretRef:
+                name: app-secrets

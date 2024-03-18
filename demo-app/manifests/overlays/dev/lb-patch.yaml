@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-app
+  annotations:
+    alb.ingress.kubernetes.io/load-balancer-name: dev-eks-cluster
+    alb.ingress.kubernetes.io/subnets: subnet-39eb5b63, subnet-9781f6f1
+    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300
+    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=5
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=devops
+    alb.ingress.kubernetes.io/group.name: dev
+spec:
+  ingressClassName: alb
+  rules:
+    - host: demo-app.rentrahisi.co.ke
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-app
+                port:
+                  number: 8080
