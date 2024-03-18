@@ -175,9 +175,9 @@ variable "argo_repo" {
   default = "git@github.com:leroykayanda"
 }
 
-# variable "argo_slack_token" {
-#   type = string
-# }
+variable "argo_slack_token" {
+  type = string
+}
 
 variable "argocd_image_updater_values" {
   type = map(list(string))
@@ -186,9 +186,9 @@ variable "argocd_image_updater_values" {
       <<EOF
 config:
   registries:
-    - name: dev-references
-      api_url: https://973967305414.dkr.ecr.eu-west-1.amazonaws.com
-      prefix: 973967305414.dkr.ecr.eu-west-1.amazonaws.com
+    - name: dev-demo-app
+      api_url: https://735265414519.dkr.ecr.eu-west-1.amazonaws.com
+      prefix: 735265414519.dkr.ecr.eu-west-1.amazonaws.com
       ping: yes
       insecure: no
       credentials: ext:/scripts/ecr-login.sh

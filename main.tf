@@ -1,6 +1,6 @@
 module "eks" {
   source                        = "app.terraform.io/RentRahisi/modules/cloud//aws/eks"
-  version                       = "1.0.11"
+  version                       = "1.0.14"
   env                           = var.env
   team                          = var.team
   cluster_name                  = "${var.env}-${var.cluster_name}"
@@ -24,6 +24,8 @@ module "eks" {
   argo_lb_zone_id               = var.argo_lb_zone_id[var.env]
   argo_repo                     = var.argo_repo
   argo_ssh_private_key          = var.argo_ssh_private_key
+  argo_slack_token              = var.argo_slack_token
+  argocd_image_updater_values   = var.argocd_image_updater_values[var.env]
 
   providers = {
     kubernetes = kubernetes
