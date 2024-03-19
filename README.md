@@ -60,6 +60,7 @@ Add the app's ECR repo in the terraform variable named argocd_image_updater_valu
 Test the app.
 
 **Misc**
+
 We can use cloudwatch log insights to search deployment logs using deployment and namespace names as filters.
 
     fields  @timestamp, log, kubernetes.container_name
