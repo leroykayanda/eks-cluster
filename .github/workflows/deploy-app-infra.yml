@@ -1,4 +1,4 @@
-name: Deploy-Infra
+name: Deploy Infra
 
 on:
   workflow_call:
