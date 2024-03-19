@@ -53,7 +53,7 @@ variable "public_subnets" {
 #k8s
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
-  default     = true
+  default     = false
 }
 
 variable "cluster_version" {
