@@ -3,7 +3,7 @@ terraform {
     organization = "RentRahisi"
 
     workspaces {
-      prefix = "demo-app-"
+      prefix = "demo-app-aws-"
     }
   }
 
