@@ -3,10 +3,13 @@ name: Build-App-Image
 on:
   workflow_call:
     inputs:
-      region:
+      REGION:
         required: true
         type: string
-      ecr_repo:
+      ECR_REPO:
+        required: true
+        type: string
+      DOCKERFILE:
         required: true
         type: string
     secrets:
@@ -16,8 +19,9 @@ on:
         required: true
 
 env:
-  AWS_REGION: ${{ inputs.region }}
-  ECR_REPOSITORY: ${{ inputs.ecr_repo }}
+  AWS_REGION: ${{ inputs.REGION }}
+  ECR_REPOSITORY: ${{ inputs.ECR_REPO }}
+  DOCKERFILE: ${{ inputs.DOCKERFILE }}
 
 jobs:
   build_app_image:
@@ -44,7 +48,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+          DOCKERFILE: ${{ env.DOCKERFILE }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f demo-app/Dockerfile .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE .
 
           docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
