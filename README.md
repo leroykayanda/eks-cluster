@@ -67,7 +67,7 @@ We can use cloudwatch log insights to search deployment logs using deployment an
     | sort  @timestamp  desc
     | filter kubernetes.labels.app = 'demo-app'  and kubernetes.namespace_name = 'dev-demo-app'
 
-When you add a new secret in AWS secrets manager or modify a secret, restart the deployment pods for the change to reflect. Use the command below to check when a secret was last updated.
+When you add a new secret in AWS secrets manager or modify a secret, stakater reloader will trigger a rolling update. Keep this in mind as this can cause issues in production. You may need to update secrets during a maintenance window.. Use the command below to check when a secret was last updated.
 
     kubectl describe ExternalSecret -n dev-demo-app
     Events:

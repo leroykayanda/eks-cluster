@@ -109,7 +109,7 @@ variable "argo_path" {
   type = map(string)
   default = {
     "dev"  = "demo-app/manifests/overlays/dev"
-    "prod" = "manifests/overlays/prod"
+    "prod" = ""
   }
 }
 
