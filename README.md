@@ -25,14 +25,13 @@ We create these components via terraform.
  - app service account 
  - cloudwatch alarms 
  - ECR repo
- - argocd domain name
  - argocd application
 
 We then create these components via Kustomize.
 
 - deployment
 - service
-- ExternalSecret - new secret, update secret
+- ExternalSecret
 - load balancer controller
 - HPA
 - app namespace
