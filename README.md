@@ -31,7 +31,7 @@ We then create these components via Kustomize.
 
 - deployment
 - service
-- ExternalSecret
+- secrets
 - load balancer controller
 - HPA
 - app namespace
