@@ -180,13 +180,12 @@ variable "argo_slack_token" {
 }
 
 variable "argocd_image_updater_values" {
-  type = map(list(string))
-  default = {
-    "dev" = [
-      <<EOF
+  type = list(string)
+  default = [
+    <<EOF
 config:
   registries:
-    - name: dev-demo-app
+    - name: ECR
       api_url: https://735265414519.dkr.ecr.eu-west-1.amazonaws.com
       prefix: 735265414519.dkr.ecr.eu-west-1.amazonaws.com
       ping: yes
@@ -200,8 +199,5 @@ authScripts:
       #!/bin/sh
       aws ecr --region eu-west-1 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d
 EOF
-    ],
-    "prod" = [
-    ]
-  }
+  ]
 }

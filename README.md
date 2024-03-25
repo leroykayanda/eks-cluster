@@ -1,4 +1,5 @@
 
+
 This repo contains terraform code that sets up an EKS cluster and a demo application.
 
 **EKS cluser components**
@@ -55,8 +56,7 @@ Verify the kustomize resources have been created. Get the argocd password.
 
 
 Add the variables ARGOCD_AUTH_USERNAME (admin) and ARGOCD_AUTH_PASSWORD (gotten above) as terraform env variables. Set up the terraform provider and backend and create the argocd application. Set up the argocd domain name as well.
-
-Add the app's ECR repo in the terraform variable named argocd_image_updater_values. Apply the changes in terraform.
+ Apply the changes in terraform.
 Test the app.
 
 **Misc**

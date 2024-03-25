@@ -25,7 +25,7 @@ module "eks" {
   argo_repo                     = var.argo_repo
   argo_ssh_private_key          = var.argo_ssh_private_key
   argo_slack_token              = var.argo_slack_token
-  argocd_image_updater_values   = var.argocd_image_updater_values[var.env]
+  argocd_image_updater_values   = var.argocd_image_updater_values
 
   providers = {
     kubernetes = kubernetes
