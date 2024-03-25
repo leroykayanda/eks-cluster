@@ -2,6 +2,8 @@
 
 This repo contains terraform code that sets up an EKS cluster and a demo application.
 
+[Terraform modules](https://github.com/leroykayanda/terraform-cloud-modules)
+
 **EKS cluser components**
 1.  EKS module
 2. cloudwatch container insights for metrics
