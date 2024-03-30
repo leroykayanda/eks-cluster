@@ -50,6 +50,7 @@ variable "dns_name" {
     "prod" = ""
   }
 }
+#
 
 #k8s
 variable "kubernetes_cluster_name" {
