@@ -1,6 +1,6 @@
 module "eks" {
   source                        = "app.terraform.io/RentRahisi/modules/cloud//aws/eks"
-  version                       = "1.0.24"
+  version                       = "1.0.25"
   env                           = var.env
   team                          = var.team
   cluster_name                  = "${var.env}-${var.cluster_name}"
