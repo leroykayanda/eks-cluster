@@ -62,8 +62,6 @@ resource "aws_iam_role_policy_attachment" "attachment" {
 }
 
 resource "kubernetes_service_account" "this" {
-  depends_on = [kubernetes_namespace.ns]
-
   metadata {
     name      = var.service
     namespace = "${var.env}-${var.service}"
