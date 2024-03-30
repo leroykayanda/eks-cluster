@@ -15,3 +15,10 @@ patches:
   - path: ExternalSecret-patch.yaml
   - path: lb-patch.yaml
   - path: hpa-patch.yaml
+  - target:
+      kind: Namespace
+      name: default
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: dev-demo-app

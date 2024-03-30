@@ -1,9 +1,3 @@
-resource "kubernetes_namespace" "ns" {
-  metadata {
-    name = "${var.env}-${var.service}"
-  }
-}
-
 #app DNS record
 
 data "aws_lb" "ingress" {
