@@ -7,3 +7,4 @@ resources:
   - ExternalSecret.yaml
   - lb_controller.yaml
   - hpa.yaml
+  - namespace.yaml
