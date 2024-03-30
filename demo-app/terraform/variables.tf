@@ -24,6 +24,10 @@ variable "team" {
 
 variable "sns_topic" {
   type = map(string)
+  default = {
+    "dev"  = "arn:aws:sns:eu-west-1:REDACTED:Tell-Developers"
+    "prod" = ""
+  }
 }
 
 variable "image_tag_mutability" {
@@ -33,30 +37,16 @@ variable "image_tag_mutability" {
 
 #R53 alias
 variable "zone_id" {
-  type    = string
-  default = "Z10421303ISFAWMPOGQET"
+  type        = string
+  description = "Route53 zone to create app dns name in"
+  default     = "Z10421303ISFAWMPOGQET"
 }
 
 variable "dns_name" {
-  type = map(string)
+  type        = map(string)
+  description = "dns name of the app"
   default = {
     "dev"  = "demo-app.rentrahisi.co.ke"
-    "prod" = ""
-  }
-}
-
-variable "lb_dns_name" {
-  type = map(string)
-  default = {
-    "dev"  = "dev-eks-cluster-1403757379.eu-west-1.elb.amazonaws.com"
-    "prod" = ""
-  }
-}
-
-variable "lb_zone_id" {
-  type = map(string)
-  default = {
-    "dev"  = "Z32O12XQLNTSW2"
     "prod" = ""
   }
 }
@@ -93,12 +83,14 @@ variable "argo_annotations" {
 }
 
 variable "argo_repo" {
-  type    = string
-  default = "git@github.com:leroykayanda/eks-cluster.git"
+  type        = string
+  description = "repo containing manifest files"
+  default     = "git@github.com:leroykayanda/eks-cluster.git"
 }
 
 variable "argo_target_revision" {
-  type = map(string)
+  description = "branch containing app code"
+  type        = map(string)
   default = {
     "dev"  = "main"
     "prod" = ""
@@ -106,7 +98,8 @@ variable "argo_target_revision" {
 }
 
 variable "argo_path" {
-  type = map(string)
+  type        = map(string)
+  description = "path of the manifest files"
   default = {
     "dev"  = "demo-app/manifests/overlays/dev"
     "prod" = ""
@@ -114,7 +107,8 @@ variable "argo_path" {
 }
 
 variable "argo_server" {
-  type = map(string)
+  type        = map(string)
+  description = "dns name of the argocd server"
   default = {
     "dev"  = "dev-argo.rentrahisi.co.ke:443"
     "prod" = ""

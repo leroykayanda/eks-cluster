@@ -23,37 +23,19 @@ variable "cluster_name" {
 
 variable "sns_topic" {
   type = map(string)
-}
-
-#vpc
-variable "vpc_id" {
-  type = map(string)
   default = {
-    "dev"  = "vpc-a55451c3"
+    "dev"  = "arn:aws:sns:eu-west-1:REDACTED:Tell-Developers"
     "prod" = ""
-  }
-}
-
-variable "private_subnets" {
-  type = map(list(string))
-  default = {
-    "dev"  = ["subnet-39eb5b63", "subnet-9781f6f1"],
-    "prod" = []
-  }
-}
-
-variable "public_subnets" {
-  type = map(list(string))
-  default = {
-    "dev"  = [],
-    "prod" = []
   }
 }
 
 #k8s
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
-  default     = false
+  default = {
+    "dev"  = true
+    "prod" = false
+  }
 }
 
 variable "cluster_version" {
@@ -86,9 +68,23 @@ variable "nodegroup_properties" {
 }
 
 variable "access_entries" {
-  type        = map(any)
-  default     = {}
-  description = "Map of access entries for the EKS cluster"
+  type = map(any)
+  default = {
+    mike = {
+      kubernetes_group = []
+      principal_arn    = "arn:aws:iam::1234567:user/mike"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            namespaces = []
+            type       = "cluster"
+          }
+        }
+      }
+    }
+  }
+  description = "Map of access entries for the EKS cluster. Used to authenticate users to the cluster"
 }
 
 variable "argo_load_balancer_attributes" {
@@ -124,63 +120,46 @@ variable "company_name" {
 #argoCD
 
 variable "zone_id" {
-  type    = string
-  default = "Z10421303ISFAWMPOGQET"
-}
-
-variable "argo_subnets" {
-  type = map(string)
-  default = {
-    "dev"  = "subnet-39eb5b63, subnet-9781f6f1"
-    "prod" = ""
-  }
+  type        = string
+  default     = "Z10421303ISFAWMPOGQET"
+  description = "Route53 zone to create ArgoCD dns name in"
 }
 
 variable "certificate_arn" {
-  type    = string
-  default = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
+  type        = string
+  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
+  description = "ACM certificate to be used by ingress"
 }
 
 variable "argo_domain_name" {
-  type = map(string)
+  type        = map(string)
+  description = "domain name for argocd ingress"
   default = {
     "dev"  = "dev-argo.rentrahisi.co.ke"
     "prod" = ""
   }
 }
 
-variable "argo_lb_dns_name" {
-  type = map(string)
-  default = {
-    "dev"  = "dev-eks-cluster-1403757379.eu-west-1.elb.amazonaws.com"
-    "prod" = ""
-  }
-}
-
-variable "argo_lb_zone_id" {
-  type = map(string)
-  default = {
-    "dev"  = "Z32O12XQLNTSW2"
-    "prod" = ""
-  }
-}
-
 variable "argo_ssh_private_key" {
-  description = "The SSH private key"
+  description = "The SSH private key. ArgoCD uses this to authenticate to the repos in your github org"
   type        = string
 }
 
 variable "argo_repo" {
-  type    = string
-  default = "git@github.com:leroykayanda"
+  type        = string
+  description = "repo where manifest files needed by argocd are stored"
+  default     = "git@github.com:leroykayanda"
 }
 
 variable "argo_slack_token" {
-  type = string
+  type        = string
+  default     = "xoxb-redacted"
+  description = "Used by ArgoCD notifications to send alerts to Slack"
 }
 
 variable "argocd_image_updater_values" {
-  type = list(string)
+  type        = list(string)
+  description = "specifies authentication details needed by argocd image updater"
   default = [
     <<EOF
 config:

@@ -4,7 +4,7 @@ metadata:
   name: demo-app
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: dev-eks-cluster
-    alb.ingress.kubernetes.io/subnets: subnet-39eb5b63, subnet-9781f6f1
+    alb.ingress.kubernetes.io/subnets: subnet-0bb77ef4b814b2993, subnet-0cc3dfd742ca70971
     alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300
     alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=5
     alb.ingress.kubernetes.io/tags: Environment=dev,Team=devops

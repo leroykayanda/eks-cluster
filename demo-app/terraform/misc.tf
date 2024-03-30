@@ -1,12 +1,23 @@
+resource "kubernetes_namespace" "ns" {
+  metadata {
+    name = "${var.env}-${var.service}"
+  }
+}
+
 #app DNS record
+
+data "aws_lb" "ingress" {
+  name = "${var.env}-eks-cluster"
+}
+
 resource "aws_route53_record" "alb" {
   zone_id = var.zone_id
   name    = var.dns_name[var.env]
   type    = "A"
 
   alias {
-    name                   = var.lb_dns_name[var.env]
-    zone_id                = var.lb_zone_id[var.env]
+    name                   = data.aws_lb.ingress.dns_name
+    zone_id                = data.aws_lb.ingress.zone_id
     evaluate_target_health = false
   }
 }
@@ -57,6 +68,8 @@ resource "aws_iam_role_policy_attachment" "attachment" {
 }
 
 resource "kubernetes_service_account" "this" {
+  depends_on = [kubernetes_namespace.ns]
+
   metadata {
     name      = var.service
     namespace = "${var.env}-${var.service}"
