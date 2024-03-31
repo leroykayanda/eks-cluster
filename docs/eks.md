@@ -24,7 +24,6 @@
 3. argo_ssh_private_key
 4. env
 5. sns_topic
-6. company_name
 
 - set up these variables in eks/variables.tf. Modify any other variables that you may need to e.g region
 
@@ -32,6 +31,7 @@
 2. certificate_arn
 3. argo_domain_name
 4. argocd_image_updater_values
+5. company_name
 
 - Run terraform init and terraform apply
 - At this point, the cluster has been created
@@ -55,4 +55,4 @@
 
 `kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode`
 
-6. After logging in, go to settings>repositories to make sure argocd has credentials to log in to your github argo.
+6. After logging in, go to settings>repositories to make sure argocd has credentials to log in to your github organization.
