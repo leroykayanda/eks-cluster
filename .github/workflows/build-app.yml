@@ -59,7 +59,7 @@ jobs:
       - name: Test
         id: build-image
         run: |
-          ls -ll
+          ls -ll demo-app
 
       - name: Build, tag, and push image to ECR
         uses: vitr/actions-build-and-upload-to-ecs@master
