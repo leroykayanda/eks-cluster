@@ -10,7 +10,7 @@ jobs:
     with:
       ECR_REPO: dev-demo-app
       REGION: eu-west-1
-      DOCKERFILE: demo-app/Dockerfile 
+      DOCKERFILE: .
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
