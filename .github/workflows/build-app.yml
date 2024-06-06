@@ -56,13 +56,9 @@ jobs:
 
       #     docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
 
-      - name: Test
-        id: build-image
-        run: |
-          ls -ll demo-app
 
       - name: Build, tag, and push image to ECR
-        uses: vitr/actions-build-and-upload-to-ecs@master
+        uses: docker://ghcr.io/kciter/aws-ecr-action:latest
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
