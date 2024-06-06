@@ -10,11 +10,10 @@ jobs:
     with:
       ECR_REPO: dev-demo-app
       REGION: eu-west-1
-      DOCKERFILE: demo-app
+      DOCKERFILE: demo-app/Dockerfile
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
 
   deploy-app-infra:
     uses: ./.github/workflows/deploy-infra.yml
