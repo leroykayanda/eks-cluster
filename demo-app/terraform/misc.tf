@@ -1,3 +1,11 @@
+# app namespace
+
+resource "kubernetes_namespace" "ns" {
+  metadata {
+    name = var.service
+  }
+}
+
 #app DNS record
 
 data "aws_lb" "ingress" {
@@ -17,6 +25,7 @@ resource "aws_route53_record" "alb" {
 }
 
 #app permissions
+
 resource "aws_iam_role" "role" {
   name = "${var.env}-${var.service}"
   assume_role_policy = jsonencode({
@@ -42,10 +51,6 @@ resource "aws_iam_policy" "policy" {
     Statement = [
       {
         Action = [
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:GetObject",
-          "s3:DeleteObject",
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
@@ -61,19 +66,80 @@ resource "aws_iam_role_policy_attachment" "attachment" {
   policy_arn = aws_iam_policy.policy.arn
 }
 
-resource "kubernetes_service_account" "this" {
+resource "kubernetes_service_account" "sa" {
   metadata {
     name      = var.service
-    namespace = "${var.env}-${var.service}"
+    namespace = var.service
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.role.arn
     }
   }
   automount_service_account_token = true
+
+  depends_on = [
+    kubernetes_namespace.ns
+  ]
 }
 
+# secret
+resource "aws_secretsmanager_secret" "secret" {
+  name = "${var.env}-${var.service}"
+}
+
+resource "aws_secretsmanager_secret_version" "data" {
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = jsonencode(var.app_secrets)
+}
+
+#argocd app
+
+# resource "argocd_application" "app" {
+#   metadata {
+#     name        = "${var.env}-${var.service}"
+#     namespace   = "argocd"
+#     annotations = var.argo_annotations[var.env]
+#     labels = {
+#       service = var.service
+#       env     = var.env
+#     }
+#   }
+
+#   spec {
+#     source {
+#       repo_url        = var.argo_repo
+#       target_revision = var.argo_target_revision[var.env]
+#       path            = var.argo_path[var.env]
+#     }
+#     destination {
+#       server    = "https://kubernetes.default.svc"
+#       namespace = "${var.env}-${var.service}"
+#     }
+#     sync_policy {
+#       automated {
+#         prune       = true
+#         self_heal   = true
+#         allow_empty = false
+#       }
+#       sync_options = [
+#         "Validate=true",
+#         "CreateNamespace=false",
+#         "PrunePropagationPolicy=foreground"
+#       ]
+#     }
+
+#     ignore_difference {
+#       group         = "apps"
+#       kind          = "Deployment"
+#       json_pointers = ["/spec/replicas"]
+#     }
+#   }
+# }
+
+
 #number of running pods in a service alarm
+
 resource "aws_cloudwatch_metric_alarm" "service_number_of_running_pods" {
+  count               = var.metrics_type == "cloudwatch" ? 1 : 0
   alarm_name          = "${var.env}-${var.service}-No-Running-Pods"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -101,7 +167,9 @@ resource "aws_cloudwatch_metric_alarm" "service_number_of_running_pods" {
 }
 
 #pod mem usage alarm
+
 resource "aws_cloudwatch_metric_alarm" "pod_memory_utilization_over_pod_limit" {
+  count               = var.metrics_type == "cloudwatch" ? 1 : 0
   alarm_name          = "${var.env}-${var.service}-High-Memory-Usage"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -129,7 +197,9 @@ resource "aws_cloudwatch_metric_alarm" "pod_memory_utilization_over_pod_limit" {
 }
 
 #pod cpu usage alarm
+
 resource "aws_cloudwatch_metric_alarm" "pod_cpu_utilization_over_pod_limit" {
+  count               = var.metrics_type == "cloudwatch" ? 1 : 0
   alarm_name          = "${var.env}-${var.service}-High-CPU-Usage"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -153,48 +223,5 @@ resource "aws_cloudwatch_metric_alarm" "pod_cpu_utilization_over_pod_limit" {
   tags = {
     Environment = var.env
     Team        = var.team
-  }
-}
-
-#argocd app
-resource "argocd_application" "app" {
-  metadata {
-    name        = "${var.env}-${var.service}"
-    namespace   = "argocd"
-    annotations = var.argo_annotations[var.env]
-    labels = {
-      service = var.service
-      env     = var.env
-    }
-  }
-
-  spec {
-    source {
-      repo_url        = var.argo_repo
-      target_revision = var.argo_target_revision[var.env]
-      path            = var.argo_path[var.env]
-    }
-    destination {
-      server    = "https://kubernetes.default.svc"
-      namespace = "${var.env}-${var.service}"
-    }
-    sync_policy {
-      automated {
-        prune       = true
-        self_heal   = true
-        allow_empty = false
-      }
-      sync_options = [
-        "Validate=true",
-        "CreateNamespace=false",
-        "PrunePropagationPolicy=foreground"
-      ]
-    }
-
-    ignore_difference {
-      group         = "apps"
-      kind          = "Deployment"
-      json_pointers = ["/spec/replicas"]
-    }
   }
 }

@@ -33,6 +33,13 @@ variable "sns_topic" {
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
   default = {
+    "dev"  = true
+    "prod" = false
+  }
+}
+
+variable "cluster_not_terminated" {
+  default = {
     "dev"  = false
     "prod" = false
   }
@@ -40,18 +47,60 @@ variable "cluster_created" {
 
 variable "cluster_version" {
   type    = string
-  default = "1.29"
+  default = "1.30"
 }
 
-variable "nodegroup_properties" {
+variable "initial_nodegroup" {
   type = any
   default = {
     "dev" = {
       "min_size"       = 1
       "max_size"       = 2
       "desired_size"   = 1
-      "instance_types" = ["t3.small"]
+      "instance_types" = ["t3.medium"]
       "capacity_type"  = "ON_DEMAND"
+      "iam_role_additional_policies" = {
+        AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 200
+            delete_on_termination = true
+          }
+        }
+      }
+    }
+    "prod" = {
+    }
+  }
+}
+
+variable "critical_nodegroup" {
+  type = any
+  default = {
+    "dev" = {
+      "min_size"       = 2
+      "max_size"       = 2
+      "desired_size"   = 2
+      "instance_types" = ["t3.large"]
+      "capacity_type"  = "ON_DEMAND"
+      labels = {
+        priority = "critical"
+      }
+      taints = [
+        {
+          key    = "priority"
+          value  = "critical"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+      "iam_role_additional_policies" = {
+        AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
       block_device_mappings = {
         xvda = {
           device_name = "/dev/xvda"
@@ -87,28 +136,17 @@ variable "access_entries" {
   description = "Map of access entries for the EKS cluster. Used to authenticate users to the cluster"
 }
 
-variable "argo_load_balancer_attributes" {
-  type = map(string)
-  default = {
-    "dev"  = "access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300"
-    "prod" = ""
-  }
+
+variable "certificate_arn" {
+  type        = string
+  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
+  description = "ACM certificate to be used by ingress"
 }
 
-variable "argo_target_group_attributes" {
-  type = map(string)
-  default = {
-    "dev"  = "deregistration_delay.timeout_seconds=5"
-    "prod" = ""
-  }
-}
-
-variable "argo_tags" {
-  type = map(string)
-  default = {
-    "dev"  = "Environment=dev,Team=devops"
-    "prod" = ""
-  }
+variable "zone_id" {
+  type        = string
+  default     = "Z10421303ISFAWMPOGQET"
+  description = "Route53 zone to create ArgoCD dns name in"
 }
 
 variable "company_name" {
@@ -117,38 +155,39 @@ variable "company_name" {
   default     = "rentrahisi"
 }
 
-#argoCD
-
-variable "zone_id" {
-  type        = string
-  default     = "Z10421303ISFAWMPOGQET"
-  description = "Route53 zone to create ArgoCD dns name in"
+variable "metrics_type" {
+  description = "cloudwatch or prometheus-grafana"
+  default     = "prometheus-grafana"
 }
 
-variable "certificate_arn" {
-  type        = string
-  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
-  description = "ACM certificate to be used by ingress"
+variable "logs_type" {
+  description = "cloudwatch or elk"
+  default     = "elk"
 }
 
-variable "argo_domain_name" {
-  type        = map(string)
-  description = "domain name for argocd ingress"
+variable "autoscaling_type" {
+  description = "cluster-autoscaler or karpenter"
+  default     = "karpenter"
+}
+
+# ArgoCD
+
+variable "argocd" {
+  type = any
   default = {
-    "dev"  = "dev-argo.rentrahisi.co.ke"
-    "prod" = ""
+    "dev" = {
+      dns_name                 = "dev-argo.rentrahisi.co.ke"
+      repo                     = "git@github.com:leroykayanda"
+      load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300"
+      target_group_attributes  = "deregistration_delay.timeout_seconds=5"
+      tags                     = "Environment=dev,Team=devops"
+    }
   }
 }
 
 variable "argo_ssh_private_key" {
   description = "The SSH private key. ArgoCD uses this to authenticate to the repos in your github org"
   type        = string
-}
-
-variable "argo_repo" {
-  type        = string
-  description = "repo where manifest files needed by argocd are stored"
-  default     = "git@github.com:leroykayanda"
 }
 
 variable "argo_slack_token" {
@@ -179,4 +218,85 @@ authScripts:
       aws ecr --region eu-west-1 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d
 EOF
   ]
+}
+
+# karpenter
+
+variable "karpenter" {
+  type = any
+  default = {
+    "dev" = {
+      replicas               = 1
+      instance_types         = ["t3.medium", "t3.large", "t3.xlarge"]
+      cpu_limit              = "4"
+      memory_limit           = "8Gi"
+      disruption_budget      = "50%"
+      disk_size              = "100Gi"
+      karpenter_subnet_key   = "type"
+      karpenter_subnet_value = "private-subnet"
+      expire_after           = "720h"
+    }
+  }
+}
+
+# ELK and Grafana
+
+variable "elastic_password" {
+  type = string
+}
+
+variable "elastic" {
+  type = any
+  default = {
+    "dev" = {
+      replicas           = 2
+      minimumMasterNodes = 2
+      pv_storage         = "5Gi"
+      pv_access_mode     = "ReadWriteMany"
+    }
+  }
+}
+
+variable "kibana" {
+  type = any
+  default = {
+    "dev" = {
+      dns_name = "kibana.rentrahisi.co.ke"
+    }
+  }
+}
+
+variable "prometheus" {
+  type = any
+  default = {
+    "dev" = {
+      dns_name       = "prometheus.rentrahisi.co.ke"
+      pv_storage     = "5Gi"
+      retention      = "30d"
+      pv_access_mode = "ReadWriteMany"
+    }
+  }
+}
+
+variable "grafana" {
+  type = any
+  default = {
+    "dev" = {
+      dns_name       = "grafana.rentrahisi.co.ke"
+      pv_storage     = "1Gi"
+      pv_access_mode = "ReadWriteMany"
+    }
+  }
+}
+
+variable "slack_incoming_webhook_url" {
+  type = string
+}
+
+variable "grafana_password" {
+  type = string
+}
+
+variable "grafana_user" {
+  type = string
 }

@@ -35,6 +35,14 @@ variable "image_tag_mutability" {
   default = "MUTABLE"
 }
 
+variable "app_secrets" {
+  default = {
+    FOO = "BAR"
+  }
+
+  type = map(string)
+}
+
 #R53 alias
 variable "zone_id" {
   type        = string
@@ -50,7 +58,11 @@ variable "dns_name" {
     "prod" = ""
   }
 }
-#
+
+variable "metrics_type" {
+  description = "cloudwatch or prometheus-grafana"
+  default     = "prometheus-grafana"
+}
 
 #k8s
 variable "kubernetes_cluster_name" {
@@ -75,7 +87,7 @@ variable "argo_annotations" {
     "dev" = {
       "notifications.argoproj.io/subscribe.on-health-degraded.slack" = "rentrahisi"
       "argocd-image-updater.argoproj.io/image-list"                  = "repo=735265414519.dkr.ecr.eu-west-1.amazonaws.com/dev-demo-app"
-      "argocd-image-updater.argoproj.io/repo.update-strategy"        = "latest"
+      "argocd-image-updater.argoproj.io/repo.update-strategy"        = "newest-build"
       "argocd-image-updater.argoproj.io/myimage.ignore-tags"         = "latest"
     },
     "prod" = {

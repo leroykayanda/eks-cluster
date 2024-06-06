@@ -1,0 +1,30 @@
+serviceAccountName: demo-app
+region: eu-west-1
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: demo-app
+
+podLabels:
+  app: demo-app
+
+service:
+  type: ClusterIP
+  port: 8080
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  successThreshold: 2
+  failureThreshold: 2
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "azure/application-gateway"
+    appgw.ingress.kubernetes.io/health-probe-unhealthy-threshold: "2"
+    appgw.ingress.kubernetes.io/request-timeout: "30"
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"  
+    cert-manager.io/cluster-issuer: "letsencrypt-issuer"

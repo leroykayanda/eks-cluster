@@ -7,12 +7,20 @@ terraform {
     }
   }
 
-  required_version = ">= 1.0.0"
-
   required_providers {
 
     aws = {
-      version = ">= 5.41.0"
+      version = "~> 5.51.1"
+    }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.14.0"
+    }
+
+    grafana = {
+      source  = "grafana/grafana"
+      version = "~> 3.0.0"
     }
 
   }

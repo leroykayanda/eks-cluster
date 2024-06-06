@@ -3,21 +3,19 @@ terraform {
     organization = "RentRahisi"
 
     workspaces {
-      prefix = "demo-app-aws-"
+      prefix = "aws-demo-app-"
     }
   }
-
-  required_version = ">= 1.0.0"
 
   required_providers {
 
     aws = {
-      version = ">= 5.41.0"
+      version = "~> 5.52.0"
     }
 
     argocd = {
       source  = "oboukili/argocd"
-      version = "6.0.3"
+      version = "~> 6.1.1"
     }
 
   }

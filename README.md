@@ -5,3 +5,4 @@ The terraform modules that were used can be found here - [Terraform modules](htt
 * [Setting up EKS](docs/eks.md)
 * [Setting up the demo app](docs/demo-app.md)
 * [Tearing down the infrastructure](docs/destroy.md)
+
