@@ -33,14 +33,14 @@ variable "sns_topic" {
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
   default = {
-    "dev"  = true
+    "dev"  = false
     "prod" = false
   }
 }
 
 variable "cluster_not_terminated" {
   default = {
-    "dev"  = false
+    "dev"  = true
     "prod" = false
   }
 }

@@ -1,3 +1,4 @@
+
 ## EKS Setup Instructions
 
 **Cluser components**
@@ -11,6 +12,7 @@
 8.  Metrics server
 9.  External secrets helm chart
 10. Storage - EBS or EFS CSI providers. By default we use EFS for persistent volumes because EFS is multi-az. We don't have to schedule all of a deployment's pods in the AZ which has an EBS volume which enhances fault tolerance.
+11. We set up a critical nodegroup where we make use of taints and tolerations as well as node selectors to schedule monitoring components such as ELK and Grafana. This is to ensure we retain cluster visibility in the event of an issue affecting the cluster.
 
 **Instructions**
 - Set up a terraform cloud workspace named eks-dev.
