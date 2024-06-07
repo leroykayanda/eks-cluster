@@ -3,14 +3,14 @@
 **Cluser components**
 1.  EKS module
 2.  VPC
-3. Prometheus and grafana or cloudwatch container insights for metrics
+3. Metrics - Prometheus and grafana or cloudwatch container insights
 4. ELK or fluentbit for logs
-5.  Argocd for CICD. This installs the core argocd helm chart which comes bundled with argocd notifications. We also install the argocd image updater which triggers deployments when an image is pushed to ECR. Argocd is exposed via ingress.
-6.  Karpenter or cluster autoscaler
+5.  Continuous Delivery - Argocd. This installs the core argocd helm chart which comes bundled with argocd notifications. We also install the argocd image updater which triggers deployments when an image is pushed to ECR. Argocd is exposed via ingress.
+6.  Autoscaling - Karpenter or cluster autoscaler
 7.  AWS load balancer controller
 8.  Metrics server
 9.  External secrets helm chart
-10. EBS and EFS CSI providers. By default we use EFS for persistent volumes because EFS is multi-az. We don't have to schedule all of a deployment's pods in the AZ which has an EBS volume which enhances fault tolerance.
+10. Storage - EBS or EFS CSI providers. By default we use EFS for persistent volumes because EFS is multi-az. We don't have to schedule all of a deployment's pods in the AZ which has an EBS volume which enhances fault tolerance.
 
 **Instructions**
 - Set up a terraform cloud workspace named eks-dev.

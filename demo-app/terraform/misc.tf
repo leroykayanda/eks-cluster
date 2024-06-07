@@ -116,7 +116,7 @@ resource "argocd_application" "app" {
     }
     destination {
       server    = "https://kubernetes.default.svc"
-      namespace = "${var.env}-${var.service}"
+      namespace = var.service
     }
     sync_policy {
       automated {
