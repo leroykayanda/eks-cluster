@@ -93,48 +93,51 @@ resource "aws_secretsmanager_secret_version" "data" {
 
 #argocd app
 
-# resource "argocd_application" "app" {
-#   metadata {
-#     name        = "${var.env}-${var.service}"
-#     namespace   = "argocd"
-#     annotations = var.argo_annotations[var.env]
-#     labels = {
-#       service = var.service
-#       env     = var.env
-#     }
-#   }
+resource "argocd_application" "app" {
+  metadata {
+    name        = "${var.env}-${var.service}"
+    namespace   = "argocd"
+    annotations = var.argo_annotations[var.env]
+    labels = {
+      service = var.service
+      env     = var.env
+    }
+  }
 
-#   spec {
-#     source {
-#       repo_url        = var.argo_repo
-#       target_revision = var.argo_target_revision[var.env]
-#       path            = var.argo_path[var.env]
-#     }
-#     destination {
-#       server    = "https://kubernetes.default.svc"
-#       namespace = "${var.env}-${var.service}"
-#     }
-#     sync_policy {
-#       automated {
-#         prune       = true
-#         self_heal   = true
-#         allow_empty = false
-#       }
-#       sync_options = [
-#         "Validate=true",
-#         "CreateNamespace=false",
-#         "PrunePropagationPolicy=foreground"
-#       ]
-#     }
+  spec {
+    source {
+      repo_url        = var.argocd[var.env]["repo_url"]
+      target_revision = var.argocd[var.env]["target_revision"]
+      path            = var.argocd[var.env]["path"]
+      helm {
+        release_name = var.service
+        value_files  = var.argocd[var.env]["value_files"]
+      }
+    }
+    destination {
+      server    = "https://kubernetes.default.svc"
+      namespace = "${var.env}-${var.service}"
+    }
+    sync_policy {
+      automated {
+        prune       = true
+        self_heal   = true
+        allow_empty = false
+      }
+      sync_options = [
+        "Validate=true",
+        "CreateNamespace=false",
+        "PrunePropagationPolicy=foreground"
+      ]
+    }
 
-#     ignore_difference {
-#       group         = "apps"
-#       kind          = "Deployment"
-#       json_pointers = ["/spec/replicas"]
-#     }
-#   }
-# }
-
+    ignore_difference {
+      group         = "apps"
+      kind          = "Deployment"
+      json_pointers = ["/spec/replicas"]
+    }
+  }
+}
 
 #number of running pods in a service alarm
 
