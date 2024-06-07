@@ -9,5 +9,5 @@ provider "kubernetes" {
 }
 
 provider "argocd" {
-  server_addr = var.argo_server[var.env]
+  server_addr = var.argocd[var.env]["server"]
 }

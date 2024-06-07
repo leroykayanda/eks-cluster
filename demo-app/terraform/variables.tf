@@ -102,7 +102,7 @@ variable "argocd" {
       repo_url        = "git@github.com:leroykayanda/eks-cluster.git"
       target_revision = "main"
       path            = "demo-app/helm-charts/app"
-      server          = "dev-argocd.azure.rentrahisi.co.ke:443"
+      server          = "dev-argo.rentrahisi.co.ke:443"
       value_files = [
         "../base-values.yaml",
         "../dev-values.yaml"
