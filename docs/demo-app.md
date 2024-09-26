@@ -1,3 +1,4 @@
+
 ## Demo app set up instructions
 
 **Demo app components**
@@ -19,7 +20,7 @@ Helm chart which sets up
 **Instructions**
 
 - Set up a terraform cloud workspace named demo-app-aws-dev
-- Set up aws credentials by adding 2 terraform cloud environment variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
+- Set up aws credentials by adding 2 terraform cloud environment variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY or better yet, use dynamic credentials such that terraform will assume an IAM role during each run. This is more secure than having long lived AWS credentials in terraform cloud.
 - Navigate to the demo-app folder
 - Set up demo-app/terraform/backend.tf
 - Set up these environment variables in terraform cloud.

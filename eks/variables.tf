@@ -1,4 +1,4 @@
-#general
+# General
 
 variable "region" {
   type    = string
@@ -10,39 +10,87 @@ variable "env" {
   description = "The environment i.e prod, dev etc"
 }
 
-variable "team" {
-  type        = string
-  description = "Used to tag resources"
-  default     = "devops"
-}
-
-variable "cluster_name" {
-  type    = string
-  default = "compute"
-}
-
 variable "sns_topic" {
-  type = map(string)
+  type        = map(string)
+  description = "For alarms"
   default = {
-    "dev"  = "arn:aws:sns:eu-west-1:REDACTED:Tell-Developers"
-    "prod" = ""
+    "staging" = "arn:aws:sns:eu-west-1:735265414519:project-x-notifications"
   }
 }
 
-#k8s
+variable "vpc_id" {
+  type        = map(string)
+  description = "Name of the service"
+  default = {
+    "staging" = "vpc-01ffc244c8957b246"
+  }
+}
+
+variable "vpc_cidr" {
+  type        = map(string)
+  description = "Name of the service"
+  default = {
+    "staging" = "10.2.0.0/16"
+  }
+}
+
+variable "private_subnets" {
+  type = map(list(string))
+  default = {
+    "staging" = ["subnet-0427cff875c517252", "subnet-039e8927cd8f1a352"]
+  }
+}
+
+variable "public_subnets" {
+  type = map(list(string))
+  default = {
+    "staging" = ["subnet-02c830b731654f848", "subnet-0533bd5827ce9806c"]
+  }
+}
+
+variable "tags" {
+  type = map(map(string))
+  default = {
+    "staging" = {
+      Environment          = "staging"
+      Team                 = "project-x"
+      managed_by_terraform = "True"
+    }
+  }
+}
+
+variable "cluster_tags" {
+  type = map(map(string))
+  default = {
+    "staging" = {
+      Environment                               = "staging"
+      Team                                      = "project-x"
+      managed_by_terraform                      = "True"
+      "kubernetes.io/cluster/staging-recon-eks" = "shared"
+    }
+  }
+}
+
+# Kubernetes
+
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
   default = {
-    "dev"  = false
-    "prod" = false
+    "staging" = false
+    "prod"    = false
   }
 }
 
 variable "cluster_not_terminated" {
   default = {
-    "dev"  = true
-    "prod" = false
+    "staging" = false
+    "prod"    = false
   }
+}
+
+variable "cluster_name" {
+  type    = string
+  default = "recon-eks"
 }
 
 variable "cluster_version" {
@@ -53,7 +101,7 @@ variable "cluster_version" {
 variable "initial_nodegroup" {
   type = any
   default = {
-    "dev" = {
+    "staging" = {
       "min_size"       = 1
       "max_size"       = 2
       "desired_size"   = 1
@@ -81,7 +129,7 @@ variable "initial_nodegroup" {
 variable "critical_nodegroup" {
   type = any
   default = {
-    "dev" = {
+    "staging" = {
       "min_size"       = 2
       "max_size"       = 2
       "desired_size"   = 2
@@ -136,17 +184,16 @@ variable "access_entries" {
   description = "Map of access entries for the EKS cluster. Used to authenticate users to the cluster"
 }
 
-
 variable "certificate_arn" {
   type        = string
-  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/eab25873-8e9c-4895-bd1a-80a1eac6a09e"
+  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/f8e0c747-52d8-48d1-8645-f42d976038df"
   description = "ACM certificate to be used by ingress"
 }
 
 variable "zone_id" {
   type        = string
-  default     = "Z10421303ISFAWMPOGQET"
-  description = "Route53 zone to create ArgoCD dns name in"
+  default     = "Z0052717WJUA8A2U4AH1"
+  description = "Route53 zone to create DNS records in"
 }
 
 variable "company_name" {
@@ -175,25 +222,25 @@ variable "autoscaling_type" {
 variable "argocd" {
   type = any
   default = {
-    "dev" = {
-      dns_name                 = "dev-argo.rentrahisi.co.ke"
+    "staging" = {
+      dns_name                 = "staging-argocd.rentrahisi.co.ke"
       repo                     = "git@github.com:leroykayanda"
-      load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=dev-rentrahisi-eks-cluster-alb-access-logs,idle_timeout.timeout_seconds=300"
+      load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=rentrahisi-eks-ingress-access-logs,idle_timeout.timeout_seconds=300"
       target_group_attributes  = "deregistration_delay.timeout_seconds=5"
-      tags                     = "Environment=dev,Team=devops"
+      tags                     = "Environment=staging,Team=project-x"
     }
   }
 }
 
-variable "argo_ssh_private_key" {
-  description = "The SSH private key. ArgoCD uses this to authenticate to the repos in your github org"
+variable "argocd_ssh_private_key" {
+  description = "The SSH private key. ArgoCD uses this to authenticate to the repos in your github org. Generate a public/private key-pair. The private key is set here in terraform and the public key should be imported into github in Settings > SSH and GPG keys"
   type        = string
 }
 
-variable "argo_slack_token" {
+variable "argocd_slack_token" {
   type        = string
   default     = "xoxb-redacted"
-  description = "Used by ArgoCD notifications to send alerts to Slack"
+  description = "Used by ArgoCD notifications to send alerts to Slack. The slack app should have chat:write permissions and should be installed in the channel it should post messages to"
 }
 
 variable "argocd_image_updater_values" {
@@ -220,20 +267,21 @@ EOF
   ]
 }
 
-# karpenter
+# Karpenter
 
 variable "karpenter" {
   type = any
   default = {
-    "dev" = {
-      replicas               = 1
+    "staging" = {
+      replicas               = 2
       instance_types         = ["t3.medium", "t3.large", "t3.xlarge"]
       cpu_limit              = "4"
       memory_limit           = "8Gi"
       disruption_budget      = "50%"
       disk_size              = "100Gi"
-      karpenter_subnet_key   = "type"
-      karpenter_subnet_value = "private-subnet"
+      disk_device_name       = "/dev/xvda"
+      karpenter_subnet_key   = "karpenter_can_use"
+      karpenter_subnet_value = "true"
       expire_after           = "720h"
     }
   }
@@ -248,7 +296,7 @@ variable "elastic_password" {
 variable "elastic" {
   type = any
   default = {
-    "dev" = {
+    "staging" = {
       replicas           = 2
       minimumMasterNodes = 2
       pv_storage         = "5Gi"
@@ -260,8 +308,8 @@ variable "elastic" {
 variable "kibana" {
   type = any
   default = {
-    "dev" = {
-      dns_name = "kibana.rentrahisi.co.ke"
+    "staging" = {
+      dns_name = "staging-kibana.rentrahisi.co.ke"
     }
   }
 }
@@ -269,10 +317,10 @@ variable "kibana" {
 variable "prometheus" {
   type = any
   default = {
-    "dev" = {
-      dns_name       = "prometheus.rentrahisi.co.ke"
+    "staging" = {
+      dns_name       = "staging-prometheus.rentrahisi.co.ke"
       pv_storage     = "5Gi"
-      retention      = "30d"
+      retention      = "180d"
       pv_access_mode = "ReadWriteMany"
     }
   }
@@ -281,22 +329,23 @@ variable "prometheus" {
 variable "grafana" {
   type = any
   default = {
-    "dev" = {
-      dns_name       = "grafana.rentrahisi.co.ke"
-      pv_storage     = "1Gi"
+    "staging" = {
+      dns_name       = "staging-grafana.rentrahisi.co.ke"
+      pv_storage     = "5Gi"
       pv_access_mode = "ReadWriteMany"
     }
   }
 }
 
 variable "slack_incoming_webhook_url" {
+  type        = string
+  description = "Used by Grafana for sending out alerts."
+}
+
+variable "grafana_user" {
   type = string
 }
 
 variable "grafana_password" {
-  type = string
-}
-
-variable "grafana_user" {
   type = string
 }
