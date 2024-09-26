@@ -66,6 +66,6 @@ Order
 
 `kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode`
 
-7. If ELK is being used for logs, ensure you can access the kibana dashboard.
+5. If ELK is being used for logs, ensure you can access the kibana dashboard.
 8. If Prometheus-Grafana is being used for metrics, ensure you can access prometheus as well as log in to grafana and view the kubernetes dashboard and alarms. Test whether Grafana alerts are delivered to Slack.
 9. If karpenter is being used for autoscaling, ensure karpenter is able to bring up worker nodes and there are no errors in the karpenter controller logs.
