@@ -590,7 +590,7 @@ resource "grafana_rule_group" "pod_not_ready" {
       }
 
       datasource_uid = "PBFA97CFB590B2093"
-      model          = "{\"editorMode\":\"code\",\"expr\":\"kube_pod_status_phase{phase=~\\\"(Pending|Failed|Unknown)\\\"} > 0\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
+      model          = "{\"editorMode\":\"code\",\"expr\":\"kube_pod_status_phase{phase=~\\\"(Pending|Failed|Unknown)\\\"}\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
     }
     data {
       ref_id = "B"
