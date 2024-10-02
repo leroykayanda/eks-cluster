@@ -1,4 +1,5 @@
 
+
 ## Demo app set up instructions
 
 **Demo app components**
@@ -20,32 +21,55 @@ Helm chart which sets up
 **Instructions**
 
 - Set up a terraform cloud workspace named demo-app-aws-dev
-- Set up aws credentials by adding 2 terraform cloud environment variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY or better yet, use dynamic credentials such that terraform will assume an IAM role during each run. This is more secure than having long lived AWS credentials in terraform cloud.
+- Set up aws credentials by adding 2 terraform cloud environment variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY or better yet, use [dynamic credentials](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials/aws-configuration) such that terraform will assume an IAM role during each run. This is more secure than having long lived AWS credentials in terraform cloud.
 - Navigate to the demo-app folder
 - Set up demo-app/terraform/backend.tf
 - Set up these environment variables in terraform cloud.
 
 1. env
-2. sns_topic
+2. sns_topic (If cloudwatch, rather than Grafana is being used for alerting)
 3. ARGOCD_AUTH_USERNAME 
 4. ARGOCD_AUTH_PASSWORD
 
 - Verify the variables in demo-app/terraform/variables.tf are appropriate. 
-- Modify aws_iam_policy.policy in demo-app/terraform/misc.tf with the appropriate IAM permissions for the app. 
+- Modify aws_iam_policy.policy in demo-app/terraform/miscellaneous.tf with the appropriate IAM permissions for the app. 
+- Comment out argocd_application in miscellaneous.tf. We shall create it later.
 - Run terraform init and terraform apply
 
 **Pipeline setup**
 - We use github actions to push an image to ECR. ArgoCD will detect this new image and trigger a new deployment.
-- set up these repository secrets in github.
-
-1. AWS_ACCESS_KEY_ID
-2. AWS_SECRET_ACCESS_KEY
-3. TERRAFORM_CLOUD_TOKEN
-
+- Set up a repository secret called TERRAFORM_CLOUD_TOKEN.
+- Use [this](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) to set up an IAM role that will allow Github to push images to ECR.
 - Push the changes to github so that the pipeline is triggered and an image is pushed to ECR.
-- Verify the helm chart kubernetes objects have been created
+- Test out the helm charts by installing them manually using helm install to ensure everything is okay.
+- If creating the resources one by one, follow this order.
+
+Service
+HPA
+SecretStore
+ExternalSecret
+Deployment
+Ingress
+
+**Helm Cmds**
+
+```
+helm install --dry-run demo-app app -f base-values.yaml -f dev-values.yaml
+helm install demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app
+helm uninstall demo-app -n demo-app
+
+helm upgrade --dry-run demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app
+helm upgrade demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app
+```
+
+- Delete the helm chart using helm uninstall
+- Uncomment argocd_application in miscellaneous.tf and run terraform apply
 
 **Verify that**
+- The service has endpoints registered.
+- HPA is able to retrieve scaling metrics
+- The deployment containers are healthy
+- Ingress object has reconciled
 - The app can be accessed via its domain name
 - The app can access secrets manager secrets
 - Reloader triggers a deployment when a secret is added or modified.
@@ -71,12 +95,3 @@ When you add a new secret in AWS secrets manager or modify a secret, stakater re
       Normal  Updated  23s   external-secrets  Updated Secret
 
 The app image is pushed to ECR using a Github actions workflow.
-
-**Helm Cmds**
-
-    helm install --dry-run demo-app app -f base-values.yaml -f dev-values.yaml
-    helm install demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app
-    helm uninstall demo-app -n demo-app
-    
-    helm upgrade --dry-run demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app
-    helm upgrade demo-app app -f base-values.yaml -f dev-values.yaml -n demo-app

@@ -1,4 +1,3 @@
-serviceAccountName: demo-app
 region: eu-west-1
 
 podLabels:
@@ -16,3 +15,15 @@ readinessProbe:
   periodSeconds: 30
   successThreshold: 2
   failureThreshold: 2
+
+number_of_containers: 1
+
+container:
+  name: demo-app
+  command: []
+  args:[]
+
+container_2:
+  name: celery
+  command: ["celery"]
+  args: ["-A", "core", "worker", "--loglevel=info"]

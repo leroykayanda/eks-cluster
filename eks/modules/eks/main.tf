@@ -48,7 +48,7 @@ module "eks" {
 module "access_logs_bucket" {
   count                          = var.create_access_logs_bucket ? 1 : 0
   source                         = "terraform-aws-modules/s3-bucket/aws"
-  bucket                         = "${var.company_name}-eks-ingress-access-logs"
+  bucket                         = "${var.env}-${var.company_name}-eks-ingress-access-logs"
   acl                            = "log-delivery-write"
   force_destroy                  = true
   control_object_ownership       = true

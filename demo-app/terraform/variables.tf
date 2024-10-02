@@ -1,4 +1,4 @@
-#general
+# General
 
 variable "region" {
   type    = string
@@ -43,7 +43,18 @@ variable "app_secrets" {
   type = map(string)
 }
 
-#R53 alias
+variable "tags" {
+  type = map(map(string))
+  default = {
+    "staging" = {
+      Environment = "staging"
+      Team        = "devops"
+    }
+  }
+}
+
+# R53 alias
+
 variable "zone_id" {
   type        = string
   description = "Route53 zone to create app dns name in"
@@ -64,7 +75,8 @@ variable "metrics_type" {
   default     = "prometheus-grafana"
 }
 
-#k8s
+# Kubernetes
+
 variable "kubernetes_cluster_name" {
   type    = string
   default = "compute"
@@ -80,7 +92,8 @@ variable "kubernetes_cluster_env" {
   }
 }
 
-#argocd
+# Argocd
+
 variable "argo_annotations" {
   type = map(map(string))
   default = {

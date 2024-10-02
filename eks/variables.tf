@@ -225,7 +225,7 @@ variable "argocd" {
     "staging" = {
       dns_name                 = "staging-argocd.rentrahisi.co.ke"
       repo                     = "git@github.com:leroykayanda"
-      load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=rentrahisi-eks-ingress-access-logs,idle_timeout.timeout_seconds=300"
+      load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=staging-rentrahisi-eks-ingress-access-logs,idle_timeout.timeout_seconds=300"
       target_group_attributes  = "deregistration_delay.timeout_seconds=5"
       tags                     = "Environment=staging,Team=project-x"
     }

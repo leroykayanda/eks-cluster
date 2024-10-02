@@ -21,9 +21,9 @@ spec:
         {{ $key }}: {{ $value | quote }}
       {{- end }}
     spec:
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ .Release.Name }}
       containers:
-        - name: {{ .Release.Name }}
+        - name: {{ .Values.container.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
           - containerPort: {{ .Values.service.port }}
@@ -31,6 +31,20 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          command: {{ .Values.container.command }}
+          args: {{ .Values.container.args | toJson }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}
+        {{- if eq (int .Values.number_of_containers) 2 }}
+        - name: {{ .Values.container_2.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources_2 | nindent 12 }}
+          command: {{ .Values.container_2.command }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
+        {{- end }}

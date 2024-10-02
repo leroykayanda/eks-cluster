@@ -19,6 +19,14 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+resources_2:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+
 ingress:
   enabled: true
   host: "demo-app.rentrahisi.co.ke"

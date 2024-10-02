@@ -1,4 +1,4 @@
-# app namespace
+# App namespace
 
 resource "kubernetes_namespace" "ns" {
   metadata {
@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "ns" {
   }
 }
 
-#app DNS record
+# App DNS record
 
 data "aws_lb" "ingress" {
   name = "${var.env}-eks-cluster"
@@ -24,7 +24,7 @@ resource "aws_route53_record" "alb" {
   }
 }
 
-#app permissions
+# App permissions
 
 resource "aws_iam_role" "role" {
   name = "${var.env}-${var.service}"
@@ -81,7 +81,7 @@ resource "kubernetes_service_account" "sa" {
   ]
 }
 
-# secret
+# Secret
 resource "aws_secretsmanager_secret" "secret" {
   name = "${var.env}-${var.service}"
 }
@@ -91,7 +91,7 @@ resource "aws_secretsmanager_secret_version" "data" {
   secret_string = jsonencode(var.app_secrets)
 }
 
-#argocd app
+# Argocd app
 
 resource "argocd_application" "app" {
   metadata {
@@ -139,7 +139,7 @@ resource "argocd_application" "app" {
   }
 }
 
-#number of running pods in a service alarm
+# Number of running pods in a service alarm
 
 resource "aws_cloudwatch_metric_alarm" "service_number_of_running_pods" {
   count               = var.metrics_type == "cloudwatch" ? 1 : 0
@@ -156,20 +156,16 @@ resource "aws_cloudwatch_metric_alarm" "service_number_of_running_pods" {
   ok_actions          = [var.sns_topic[var.env]]
   datapoints_to_alarm = "1"
   treat_missing_data  = "ignore"
+  tags                = var.tags[var.env]
 
   dimensions = {
     Service     = var.service
     Namespace   = "${var.env}-${var.service}"
     ClusterName = "${var.kubernetes_cluster_env[var.env]}-${var.kubernetes_cluster_name}"
   }
-
-  tags = {
-    Environment = var.env
-    Team        = var.team
-  }
 }
 
-#pod mem usage alarm
+# Pod mem usage alarm
 
 resource "aws_cloudwatch_metric_alarm" "pod_memory_utilization_over_pod_limit" {
   count               = var.metrics_type == "cloudwatch" ? 1 : 0
@@ -186,20 +182,16 @@ resource "aws_cloudwatch_metric_alarm" "pod_memory_utilization_over_pod_limit" {
   ok_actions          = [var.sns_topic[var.env]]
   datapoints_to_alarm = "1"
   treat_missing_data  = "ignore"
+  tags                = var.tags[var.env]
 
   dimensions = {
     Service     = var.service
     Namespace   = "${var.env}-${var.service}"
     ClusterName = "${var.kubernetes_cluster_env[var.env]}-${var.kubernetes_cluster_name}"
   }
-
-  tags = {
-    Environment = var.env
-    Team        = var.team
-  }
 }
 
-#pod cpu usage alarm
+# Pod cpu usage alarm
 
 resource "aws_cloudwatch_metric_alarm" "pod_cpu_utilization_over_pod_limit" {
   count               = var.metrics_type == "cloudwatch" ? 1 : 0
@@ -216,15 +208,11 @@ resource "aws_cloudwatch_metric_alarm" "pod_cpu_utilization_over_pod_limit" {
   ok_actions          = [var.sns_topic[var.env]]
   datapoints_to_alarm = "1"
   treat_missing_data  = "ignore"
+  tags                = var.tags[var.env]
 
   dimensions = {
     Service     = var.service
     Namespace   = "${var.env}-${var.service}"
     ClusterName = "${var.kubernetes_cluster_env[var.env]}-${var.kubernetes_cluster_name}"
-  }
-
-  tags = {
-    Environment = var.env
-    Team        = var.team
   }
 }
