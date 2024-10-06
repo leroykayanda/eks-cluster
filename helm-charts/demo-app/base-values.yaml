@@ -1,0 +1,45 @@
+region: eu-west-1
+
+podLabels:
+  app: demo-app
+
+service:
+  type: NodePort
+  port: 8000
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  successThreshold: 2
+  failureThreshold: 2
+
+number_of_containers: 1
+
+container:
+  name: recon
+  command: ["gunicorn"]
+  args:
+    - "--bind"
+    - "0.0.0.0:8000"
+    - "--log-level"
+    - "info"
+    - "--workers"
+    - "4"
+    - "core.wsgi:application"
+
+container_2:
+  name: celery
+  command: ["celery"]
+  args: ["-A", "core", "worker", "--loglevel=info"]
+
+
+init_container:
+  create: true
+  name: migrations
+  command: ["/bin/sh"]
+  args:
+    - "-c"
+    - "python manage.py makemigrations --noinput && python manage.py migrate --noinput"

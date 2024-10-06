@@ -22,6 +22,16 @@ spec:
       {{- end }}
     spec:
       serviceAccountName: {{ .Release.Name }}
+      {{- if .Values.init_container.create }}
+      initContainers:
+        - name: {{ .Values.init_container.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: {{ .Values.init_container.command }}
+          args: {{ .Values.init_container.args | toYaml | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
+      {{- end }}
       containers:
         - name: {{ .Values.container.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
