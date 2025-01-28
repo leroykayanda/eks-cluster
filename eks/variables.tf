@@ -13,16 +13,14 @@ variable "env" {
 variable "sns_topic" {
   type        = map(string)
   description = "For alarms"
-  default = {
-    "staging" = "arn:aws:sns:eu-west-1:735265414519:project-x-notifications"
-  }
 }
 
 variable "vpc_id" {
   type        = map(string)
   description = "Name of the service"
   default = {
-    "staging" = "vpc-01ffc244c8957b246"
+    "staging"    = "vpc-01ffc244c8957b246"
+    "production" = ""
   }
 }
 
@@ -30,22 +28,30 @@ variable "vpc_cidr" {
   type        = map(string)
   description = "Name of the service"
   default = {
-    "staging" = "10.2.0.0/16"
+    "staging"    = "10.0.0.0/16"
+    "production" = ""
   }
 }
 
 variable "private_subnets" {
   type = map(list(string))
   default = {
-    "staging" = ["subnet-0427cff875c517252", "subnet-039e8927cd8f1a352"]
+    "staging"    = ["10.0.1.0/24", "10.0.2.0/24"]
+    "production" = []
   }
 }
 
 variable "public_subnets" {
   type = map(list(string))
   default = {
-    "staging" = ["subnet-02c830b731654f848", "subnet-0533bd5827ce9806c"]
+    "staging"    = ["10.0.3.0/24", "10.0.4.0/24"]
+    "production" = []
   }
+}
+
+variable "azs" {
+  type    = list(string)
+  default = ["eu-west-1a", "eu-west-1b"]
 }
 
 variable "tags" {
@@ -53,20 +59,13 @@ variable "tags" {
   default = {
     "staging" = {
       Environment          = "staging"
-      Team                 = "project-x"
+      Team                 = "devops"
       managed_by_terraform = "True"
-    }
-  }
-}
-
-variable "cluster_tags" {
-  type = map(map(string))
-  default = {
-    "staging" = {
-      Environment                               = "staging"
-      Team                                      = "project-x"
-      managed_by_terraform                      = "True"
-      "kubernetes.io/cluster/staging-recon-eks" = "shared"
+    },
+    "production" = {
+      Environment          = "production"
+      Team                 = "devops"
+      managed_by_terraform = "True"
     }
   }
 }
@@ -76,26 +75,26 @@ variable "cluster_tags" {
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
   default = {
-    "staging" = false
-    "prod"    = false
+    "staging"    = false
+    "production" = false
   }
 }
 
 variable "cluster_not_terminated" {
   default = {
-    "staging" = false
-    "prod"    = false
+    "staging"    = false
+    "production" = false
   }
 }
 
 variable "cluster_name" {
   type    = string
-  default = "recon-eks"
+  default = "demo"
 }
 
 variable "cluster_version" {
   type    = string
-  default = "1.30"
+  default = "1.32"
 }
 
 variable "initial_nodegroup" {
@@ -121,7 +120,25 @@ variable "initial_nodegroup" {
         }
       }
     }
-    "prod" = {
+    "production" = {
+      "min_size"       = 1
+      "max_size"       = 2
+      "desired_size"   = 1
+      "instance_types" = ["t3.medium"]
+      "capacity_type"  = "ON_DEMAND"
+      "iam_role_additional_policies" = {
+        AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 200
+            delete_on_termination = true
+          }
+        }
+      }
     }
   }
 }
@@ -159,8 +176,37 @@ variable "critical_nodegroup" {
         }
       }
     }
-    "prod" = {
+    "production" = {
+      "min_size"       = 2
+      "max_size"       = 2
+      "desired_size"   = 2
+      "instance_types" = ["t3.large"]
+      "capacity_type"  = "ON_DEMAND"
+      labels = {
+        priority = "critical"
+      }
+      taints = [
+        {
+          key    = "priority"
+          value  = "critical"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+      "iam_role_additional_policies" = {
+        AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 200
+            delete_on_termination = true
+          }
+        }
+      }
     }
+
   }
 }
 
@@ -184,17 +230,22 @@ variable "access_entries" {
   description = "Map of access entries for the EKS cluster. Used to authenticate users to the cluster"
 }
 
-variable "certificate_arn" {
-  type        = string
-  default     = "arn:aws:acm:eu-west-1:735265414519:certificate/f8e0c747-52d8-48d1-8645-f42d976038df"
-  description = "ACM certificate to be used by ingress"
+variable "base_domain_name" {
+  type    = string
+  default = "demo.rentrahisi.co.ke"
 }
 
-variable "zone_id" {
-  type        = string
-  default     = "Z0052717WJUA8A2U4AH1"
-  description = "Route53 zone to create DNS records in"
-}
+# variable "certificate_arn" {
+#   type        = string
+#   default     = "arn:aws:acm:eu-west-1:521767246022:certificate/1f819e83-ff11-4f03-b87a-65a130fc6d86"
+#   description = "ACM certificate to be used by ingress"
+# }
+
+# variable "zone_id" {
+#   type        = string
+#   default     = "Z02331641ZV9FCTVJLHSG"
+#   description = "Route53 zone to create DNS records in"
+# }
 
 variable "company_name" {
   type        = string
@@ -220,14 +271,14 @@ variable "autoscaling_type" {
 # ArgoCD
 
 variable "argocd" {
-  type = any
+  type = map(map(string))
   default = {
     "staging" = {
-      dns_name                 = "staging-argocd.rentrahisi.co.ke"
+      dns_name                 = "staging-argocd.demo.rentrahisi.co.ke"
       repo                     = "git@github.com:leroykayanda"
       load_balancer_attributes = "access_logs.s3.enabled=true,access_logs.s3.bucket=staging-rentrahisi-eks-ingress-access-logs,idle_timeout.timeout_seconds=300"
       target_group_attributes  = "deregistration_delay.timeout_seconds=5"
-      tags                     = "Environment=staging,Team=project-x"
+      tags                     = "Environment=staging,Team=devops"
     }
   }
 }
@@ -251,8 +302,8 @@ variable "argocd_image_updater_values" {
 config:
   registries:
     - name: ECR
-      api_url: https://735265414519.dkr.ecr.eu-west-1.amazonaws.com
-      prefix: 735265414519.dkr.ecr.eu-west-1.amazonaws.com
+      api_url: https://521767246022.dkr.ecr.eu-west-1.amazonaws.com
+      prefix: 521767246022.dkr.ecr.eu-west-1.amazonaws.com
       ping: yes
       insecure: no
       credentials: ext:/scripts/ecr-login.sh
@@ -275,8 +326,8 @@ variable "karpenter" {
     "staging" = {
       replicas               = 2
       instance_types         = ["t3.medium", "t3.large", "t3.xlarge"]
-      cpu_limit              = "4"
-      memory_limit           = "8Gi"
+      cpu_limit              = "8"
+      memory_limit           = "16Gi"
       disruption_budget      = "50%"
       disk_size              = "100Gi"
       disk_device_name       = "/dev/xvda"
@@ -309,7 +360,7 @@ variable "kibana" {
   type = any
   default = {
     "staging" = {
-      dns_name = "staging-kibana.rentrahisi.co.ke"
+      dns_name = "staging-kibana.demo.rentrahisi.co.ke"
     }
   }
 }
@@ -318,7 +369,7 @@ variable "prometheus" {
   type = any
   default = {
     "staging" = {
-      dns_name       = "staging-prometheus.rentrahisi.co.ke"
+      dns_name       = "staging-prometheus.demo.rentrahisi.co.ke"
       pv_storage     = "5Gi"
       retention      = "180d"
       pv_access_mode = "ReadWriteMany"
@@ -330,7 +381,7 @@ variable "grafana" {
   type = any
   default = {
     "staging" = {
-      dns_name       = "staging-grafana.rentrahisi.co.ke"
+      dns_name       = "staging-grafana.demo.rentrahisi.co.ke"
       pv_storage     = "5Gi"
       pv_access_mode = "ReadWriteMany"
     }
@@ -342,6 +393,7 @@ variable "slack_incoming_webhook_url" {
   description = "Used by Grafana for sending out alerts."
 }
 
+
 variable "grafana_user" {
   type = string
 }
@@ -349,3 +401,81 @@ variable "grafana_user" {
 variable "grafana_password" {
   type = string
 }
+
+# Keycloak
+
+variable "keycloak" {
+  type        = map(any)
+  description = "Various keycloak settings"
+  default = {
+    "staging" = {
+      dns_name   = "staging-keycloak.demo.rentrahisi.co.ke"
+      url        = "https://staging-keycloak.demo.rentrahisi.co.ke"
+      realm_name = "DEMO"
+    }
+  }
+}
+
+variable "keycloak_aurora_settings" {
+  type = map(map(any))
+  default = {
+    "staging" = {
+      "parameter_group_family"                 = "aurora-postgresql16"
+      "engine"                                 = "aurora-postgresql",
+      "engine_version"                         = "16.1",
+      "engine_mode"                            = "provisioned",
+      "serverless_cluster"                     = false
+      "backup_retention_period"                = 35,
+      "port"                                   = 5432,
+      "instance_class"                         = "db.t4g.medium"
+      "db_instance_count"                      = 1,
+      "publicly_accessible"                    = false,
+      "performance_insights_retention_period"  = 31
+      "freeable_memory_alarm_threshold"        = 1000000000
+      "disk_queue_depth_alarm_threshold"       = 200
+      "buffer_cache_hit_ratio_alarm_threshold" = 80
+      "dbload_alarm_threshold"                 = 1
+    }
+  }
+}
+
+variable "keycloak_credentials" {
+  type        = map(string)
+  description = "keycloak user and password"
+  default = {
+    user     = "value"
+    password = "value"
+  }
+}
+
+variable "keycloak_db_credentials" {
+  type        = map(string)
+  description = "keycloak DB credentials"
+  default = {
+    user     = "value"
+    password = "value"
+    db_name  = "value"
+  }
+}
+
+# Miscellaneous
+
+variable "placeholder_pods" {
+  type        = map(number)
+  description = "Number of placeholder pods to schedule. Will be evicted if we need to schedule higher priority pods"
+  default = {
+    staging = 0
+  }
+}
+
+variable "istio" {
+  type = map(map(string))
+  default = {
+    "staging" = {
+      set_up_istio   = true
+      kiali_dns_name = "staging-kiali.demo.rentrahisi.co.ke"
+    }
+  }
+}
+
+

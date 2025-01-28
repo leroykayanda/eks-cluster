@@ -56,6 +56,27 @@ variable "zone_id" {
   description = "Route53 zone to create DNS names that point to ingress"
 }
 
+variable "keycloak" {
+  type        = map(any)
+  description = "Various keycloak settings"
+}
+
+variable "keycloak_credentials" {
+  type        = map(string)
+  description = "Db and keycloak user and password"
+  default = {
+    "db_name"           = ""
+    "db_user"           = ""
+    "db_password"       = ""
+    "keycloak_user"     = ""
+    "keycloak_password" = ""
+  }
+}
+
+variable "keycloak_db_hostname" {
+  type        = string
+  description = "DB hostname"
+}
 
 # Optional inputs. We have setup sensible defaults
 
@@ -74,12 +95,6 @@ variable "sns_topic" {
 variable "tags" {
   type        = map(string)
   description = "Used to tag resources"
-  default     = {}
-}
-
-variable "cluster_tags" {
-  type        = map(string)
-  description = "Used to tag the EKS cluster"
   default     = {}
 }
 
@@ -173,18 +188,6 @@ variable "elb_access_log_expiration" {
   default     = 180
 }
 
-variable "set_up_scalyr" {
-  type        = bool
-  description = "Whether to use scalyr for logging"
-  default     = false
-}
-
-variable "scalyr_api_key" {
-  type        = string
-  description = "Must be a 'Log Write Access' API key. Log into DataSet and select your account (email address). Then select 'Api Keys'"
-  default     = null
-}
-
 variable "argocd_ssh_private_key" {
   type        = string
   description = "The SSH private key used by ArgoCD to authenticate to Github"
@@ -198,7 +201,7 @@ variable "argocd_slack_token" {
 }
 
 variable "argocd" {
-  type        = any
+  type        = map(string)
   description = "Various ArgoCD settings"
   default     = null
 }
@@ -255,4 +258,18 @@ variable "grafana_password" {
   type        = string
   description = "Grafana admin password"
   default     = null
+}
+
+variable "placeholder_pods" {
+  type        = number
+  description = "Number of placeholder pods to schedule. Will be evicted if we need to schedule higher priority pods"
+  default     = 0
+}
+
+variable "istio" {
+  type = map(string)
+  default = {
+    set_up_istio   = false
+    kiali_dns_name = null
+  }
 }

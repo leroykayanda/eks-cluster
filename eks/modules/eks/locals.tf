@@ -13,7 +13,7 @@ locals {
     "alb.ingress.kubernetes.io/load-balancer-attributes" = var.argocd["load_balancer_attributes"]
     "alb.ingress.kubernetes.io/target-group-attributes"  = var.argocd["target_group_attributes"]
     "alb.ingress.kubernetes.io/ssl-policy"               = var.elb_security_policy
-    "alb.ingress.kubernetes.io/success-codes"            = "200-399"
+    "alb.ingress.kubernetes.io/success-codes"            = "200-499"
     "alb.ingress.kubernetes.io/tags"                     = var.argocd["tags"]
     "alb.ingress.kubernetes.io/group.name"               = var.env
   }

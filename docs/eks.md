@@ -14,6 +14,7 @@
 9.  External secrets helm chart
 10. Storage - EBS or EFS CSI providers. By default we use EFS for persistent volumes because EFS is multi-az. We don't have to schedule all of a deployment's pods in the AZ which has an EBS volume which enhances fault tolerance.
 11. We set up a critical nodegroup where we make use of taints and tolerations as well as node selectors to schedule critical components such i.e ELK, Grafana and Karpenter. This is to ensure we retain cluster visibility in the event of an issue affecting the cluster.
+12. We use priority classes to schedule pods with low priority which will be evicted when higher priority pods need to be scheduled. This reduces pod startup time because we don't need to wait for instances to start up.
 
 **Instructions**
 - Set up a terraform cloud workspace named eks-dev.
@@ -62,10 +63,11 @@ Order
 
 1. A cloudwatch dashboard named dev-compute-kubernetes-cluster has been created if cloudwatch was selected for metrics.
 2. 4 cluster cloudwatch alarms have been created with the prefix dev-compute if cloudwatch was selected for metrics.
-3. You can access argocd. Use the username admin and run cmd below to get the password
+4. You can access argocd. Use the username admin and run cmd below to get the password
 
 `kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode`
 
-4. If ELK is being used for logs, ensure you can access the kibana dashboard.
-8. If Prometheus-Grafana is being used for metrics, ensure you can access prometheus as well as log in to grafana and view the kubernetes dashboard and alarms. Test whether Grafana alerts are delivered to Slack.
-9. If karpenter is being used for autoscaling, ensure karpenter is able to bring up worker nodes and there are no errors in the karpenter controller logs.
+5. If ELK is being used for logs, ensure you can access the kibana dashboard.
+6. If Prometheus-Grafana is being used for metrics, ensure you can access prometheus as well as log in to grafana and view the kubernetes dashboard and alarms. Test whether Grafana alerts are delivered to Slack.
+7. If karpenter is being used for autoscaling, ensure karpenter is able to bring up worker nodes and there are no errors in the karpenter controller logs.
+8. You can log in to Kiali if istio is enabled.

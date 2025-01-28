@@ -366,7 +366,12 @@ spec:
       "${var.karpenter["karpenter_subnet_key"]}" : "${var.karpenter["karpenter_subnet_value"]}"
   instanceProfile: "${aws_iam_instance_profile.karpenter[0].name}"
   tags:
-    ${jsonencode(var.tags)}
+    ${jsonencode(
+  merge(
+    var.tags,
+    { "Name" : "Karpenter-Node" }
+  )
+)}
   blockDeviceMappings:
   - deviceName: "${var.karpenter["disk_device_name"]}"
     ebs:

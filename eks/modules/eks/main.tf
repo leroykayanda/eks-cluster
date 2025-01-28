@@ -42,7 +42,10 @@ module "eks" {
     critical-nodegroup = var.critical_nodegroup
   }
 
-  tags = var.cluster_tags
+  tags = merge(
+    var.tags,
+    { "kubernetes.io/cluster/${var.cluster_name}" = "shared" }
+  )
 }
 
 module "access_logs_bucket" {

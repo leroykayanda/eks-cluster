@@ -3,7 +3,7 @@ terraform {
     organization = "RentRahisi"
 
     workspaces {
-      prefix = "recon-eks-"
+      prefix = "eks-"
     }
   }
 
@@ -21,6 +21,11 @@ terraform {
     grafana = {
       source  = "grafana/grafana"
       version = "~> 3.0.0"
+    }
+
+    keycloak = {
+      source  = "mrparkers/keycloak"
+      version = "4.4.0"
     }
 
   }

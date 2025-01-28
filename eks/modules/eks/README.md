@@ -41,6 +41,12 @@
       create_pv_full_alert           = var.create_pv_full_alert
       elb_security_policy            = var.elb_security_policy
       elb_access_log_expiration      = var.elb_access_log_expiration
+      set_up_newrelic                = var.set_up_newrelic
+      newrelic_license_key           = var.newrelic_license_key
+      placeholder_pods               = var.placeholder_pods
+      set_up_istio                   = var.set_up_istio
+      istio                          = var.istio[var.env]
+      keycloak                       = var.keycloak[var.env]
       tags                           = var.tags[var.env]
     
       providers = {

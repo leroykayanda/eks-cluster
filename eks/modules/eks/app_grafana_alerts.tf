@@ -52,7 +52,7 @@ resource "grafana_rule_group" "node_memory" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -116,7 +116,7 @@ resource "grafana_rule_group" "node_cpu" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -178,7 +178,7 @@ resource "grafana_rule_group" "node_disk" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -236,12 +236,12 @@ resource "grafana_rule_group" "node_condition" {
       }
 
       datasource_uid = "__expr__"
-      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[1],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
 
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "2m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -277,7 +277,8 @@ resource "grafana_rule_group" "container_mem_limit_use" {
       }
 
       datasource_uid = "PBFA97CFB590B2093"
-      model          = "{\"editorMode\":\"code\",\"expr\":\"sum(container_memory_working_set_bytes{image!=\\\"\\\"})  by (container) / sum(kube_pod_container_resource_limits{resource=\\\"memory\\\"})  by (container)\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
+      model          = "{\"editorMode\":\"code\",\"expr\":\"round(\\n  100 *\\n    avg(container_memory_working_set_bytes{image!=\\\"\\\"}) by (pod, container, namespace)\\n      /\\n    avg(kube_pod_container_resource_limits{resource=\\\"memory\\\"} > 0) by (pod, container, namespace)\\n)\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
+
     }
     data {
       ref_id = "B"
@@ -299,11 +300,11 @@ resource "grafana_rule_group" "container_mem_limit_use" {
       }
 
       datasource_uid = "__expr__"
-      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0.9],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[90],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -339,7 +340,7 @@ resource "grafana_rule_group" "container_cpu_limit_use" {
       }
 
       datasource_uid = "PBFA97CFB590B2093"
-      model          = "{\"editorMode\":\"code\",\"expr\":\"sum(rate(container_cpu_usage_seconds_total{image!=\\\"\\\"}[5m])) by (container) / sum(kube_pod_container_resource_limits{resource=\\\"cpu\\\"}) by (container)\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
+      model          = "{\"editorMode\":\"code\",\"expr\":\"round(\\n  100 *\\n    avg by (pod, container, namespace) (rate(container_cpu_usage_seconds_total[5m]))\\n      /\\n    avg(kube_pod_container_resource_limits{resource=\\\"cpu\\\"} > 0) by (pod, container, namespace)\\n)\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
     }
     data {
       ref_id = "B"
@@ -361,80 +362,21 @@ resource "grafana_rule_group" "container_cpu_limit_use" {
       }
 
       datasource_uid = "__expr__"
-      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0.9],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[90],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
       __panelId__      = "51"
+      description      = ""
+      runbook_url      = ""
+      summary          = ""
     }
     labels = {
-
-    }
-    is_paused = false
-  }
-}
-
-resource "grafana_rule_group" "container_oom" {
-  count = var.cluster_created && var.metrics_type == "prometheus-grafana" ? 1 : 0
-  depends_on = [
-    helm_release.grafana
-  ]
-  org_id           = 1
-  name             = "container_oom"
-  folder_uid       = grafana_folder.rule_folder[0].uid
-  interval_seconds = 60
-
-  rule {
-    name      = "Container OutOfMemory"
-    condition = "C"
-
-    data {
-      ref_id = "A"
-
-      relative_time_range {
-        from = 300
-        to   = 0
-      }
-
-      datasource_uid = "PBFA97CFB590B2093"
-      model          = "{\"editorMode\":\"code\",\"expr\":\"sum(increase(container_oom_events_total[5m])) by (namespace, pod) \",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
-    }
-    data {
-      ref_id = "B"
-
-      relative_time_range {
-        from = 300
-        to   = 0
-      }
-
-      datasource_uid = "__expr__"
-      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"B\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"A\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"reducer\":\"last\",\"refId\":\"B\",\"type\":\"reduce\"}"
-    }
-    data {
-      ref_id = "C"
-
-      relative_time_range {
-        from = 300
-        to   = 0
-      }
-
-      datasource_uid = "__expr__"
-      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
-    }
-
-    no_data_state  = "NoData"
-    exec_err_state = "Error"
-    for            = "1m"
-    annotations = {
-      __dashboardUid__ = "cdlpol5hdssg0c"
-      __panelId__      = "42"
-    }
-    labels = {
-
+      "" = ""
     }
     is_paused = false
   }
@@ -489,7 +431,7 @@ resource "grafana_rule_group" "container_restarts" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "1m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -554,7 +496,7 @@ resource "grafana_rule_group" "pv_almost_full" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -616,7 +558,7 @@ resource "grafana_rule_group" "pod_not_ready" {
     }
 
     no_data_state  = "NoData"
-    exec_err_state = "Error"
+    exec_err_state = "OK"
     for            = "5m"
     annotations = {
       __dashboardUid__ = "cdlpol5hdssg0c"
@@ -626,3 +568,139 @@ resource "grafana_rule_group" "pod_not_ready" {
     is_paused = false
   }
 }
+
+resource "grafana_rule_group" "karpenter_memory" {
+  count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
+  depends_on = [
+    helm_release.grafana
+  ]
+  org_id           = 1
+  name             = "karpenter_memory"
+  folder_uid       = grafana_folder.rule_folder[0].uid
+  interval_seconds = 60
+
+  rule {
+    name      = "High Karpenter NodePool Memory Limit Usage"
+    condition = "C"
+
+    data {
+      ref_id = "A"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "PBFA97CFB590B2093"
+      model          = "{\"datasource\":{\"type\":\"prometheus\",\"uid\":\"PBFA97CFB590B2093\"},\"editorMode\":\"code\",\"expr\":\"(karpenter_nodepool_usage{resource_type=\\\"memory\\\"} / karpenter_nodepool_limit{ resource_type=\\\"memory\\\"})*100\",\"instant\":false,\"interval\":\"\",\"intervalMs\":15000,\"legendFormat\":\"{{resource_type}}\",\"maxDataPoints\":43200,\"range\":true,\"refId\":\"A\"}"
+    }
+
+    data {
+      ref_id = "B"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"B\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"A\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"reducer\":\"mean\",\"refId\":\"B\",\"type\":\"reduce\"}"
+    }
+
+    data {
+      ref_id = "C"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[90],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
+    }
+
+    no_data_state  = "NoData"
+    exec_err_state = "OK"
+    for            = "5m"
+    annotations = {
+      __dashboardUid__ = "cdlpol5hdssg0c"
+      __panelId__      = "64"
+      description      = ""
+      runbook_url      = ""
+      summary          = ""
+    }
+    labels = {
+      "" = ""
+    }
+    is_paused = false
+  }
+}
+
+resource "grafana_rule_group" "karpenter_cpu" {
+  count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
+  depends_on = [
+    helm_release.grafana
+  ]
+  org_id           = 1
+  name             = "karpenter_cpu"
+  folder_uid       = grafana_folder.rule_folder[0].uid
+  interval_seconds = 60
+
+  rule {
+    name      = "High Karpenter NodePool CPU Limit Usage"
+    condition = "C"
+
+    data {
+      ref_id = "A"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "PBFA97CFB590B2093"
+      model          = "{\"datasource\":{\"type\":\"prometheus\",\"uid\":\"PBFA97CFB590B2093\"},\"editorMode\":\"code\",\"expr\":\"(karpenter_nodepool_usage{resource_type=\\\"cpu\\\"} / karpenter_nodepool_limit{ resource_type=\\\"cpu\\\"})*100\",\"instant\":false,\"interval\":\"\",\"intervalMs\":15000,\"legendFormat\":\"{{resource_type}}\",\"maxDataPoints\":43200,\"range\":true,\"refId\":\"A\"}"
+    }
+
+    data {
+      ref_id = "B"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"B\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"A\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"reducer\":\"mean\",\"refId\":\"B\",\"type\":\"reduce\"}"
+    }
+
+    data {
+      ref_id = "C"
+
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[90],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
+    }
+
+    no_data_state  = "NoData"
+    exec_err_state = "KeepLast"
+    for            = "1m"
+    annotations = {
+      __dashboardUid__ = "cdlpol5hdssg0c"
+      __panelId__      = "65"
+      description      = ""
+      runbook_url      = ""
+      summary          = ""
+    }
+    labels = {
+      "" = ""
+    }
+    is_paused = false
+  }
+}
+
+
