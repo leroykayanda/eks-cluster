@@ -1,16 +1,16 @@
 region: eu-west-1
 
 podLabels:
-  app: recon-core-backend
+  app: demo-app
 
 service:
   type: NodePort
-  port: 8000
+  port: 8080
 
 readinessProbe:
   httpGet:
-    path: /api/v1/health/
-    port: 8000
+    path: /
+    port: 8080
   initialDelaySeconds: 30
   periodSeconds: 30
   successThreshold: 2
@@ -19,16 +19,16 @@ readinessProbe:
 number_of_containers: 1
 
 container:
-  name: recon
-  command: ["gunicorn"]
-  args:
-    - "--bind"
-    - "0.0.0.0:8000"
-    - "--log-level"
-    - "info"
-    - "--workers"
-    - "4"
-    - "core.wsgi:application"
+  name: demo-app
+  # command: ["gunicorn"]
+  # args:
+  #   - "--bind"
+  #   - "0.0.0.0:8000"
+  #   - "--log-level"
+  #   - "info"
+  #   - "--workers"
+  #   - "4"
+  #   - "core.wsgi:application"
 
 container_2:
   name: celery
@@ -37,7 +37,7 @@ container_2:
 
 
 init_container:
-  create: true
+  create: false
   name: migrations
   command: ["/bin/sh"]
   args:
@@ -46,4 +46,4 @@ init_container:
 
 hpa:
   resource: memory
-  average_utilization: 360
+  average_utilization: 360 # limit/request * Thresold. This will scale when mem usage is 90% of the limit.

@@ -1,13 +1,13 @@
 replicaCount: 1
 minReplicas: 1
 maxReplicas: 2
-secretName: staging-recon-core-backend
+secretName: staging-demo-app
 
 podAnnotations:
-  secret.reloader.stakater.com/reload: staging-recon-core-backend
+  secret.reloader.stakater.com/reload: staging-demo-app
 
 image:
-  repository: 973967305414.dkr.ecr.eu-west-1.amazonaws.com/staging-recon-core-backend
+  repository: 521767246022.dkr.ecr.eu-west-1.amazonaws.com/staging-demo-app
   tag: latest
 
 resources:
@@ -28,16 +28,16 @@ resources_2:
 
 ingress:
   enabled: true
-  host: "staging-recon-backend.pub.credrails.com"
+  host: "demo-app.demo.rentrahisi.co.ke"
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     alb.ingress.kubernetes.io/ssl-redirect: "443"
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:973967305414:certificate/f8e0c747-52d8-48d1-8645-f42d976038df
-    alb.ingress.kubernetes.io/healthcheck-path: /api/v1/health/
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:521767246022:certificate/54976a86-fac2-4bcb-a69c-f64cf2a51a95
+    alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/load-balancer-name: staging-eks-cluster
-    alb.ingress.kubernetes.io/subnets: subnet-02c830b731654f848, subnet-0533bd5827ce9806c
-    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=staging-credrails-eks-ingress-access-logs,idle_timeout.timeout_seconds=300
+    alb.ingress.kubernetes.io/subnets: subnet-0baa498482c3cecf1, subnet-02e78b0a5e0259fe6
+    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=staging-rentrahisi-eks-ingress-access-logs,idle_timeout.timeout_seconds=300
     alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=5
-    alb.ingress.kubernetes.io/tags: Environment=staging,Team=project-x
+    alb.ingress.kubernetes.io/tags: Environment=staging,Team=devops
     alb.ingress.kubernetes.io/group.name: staging

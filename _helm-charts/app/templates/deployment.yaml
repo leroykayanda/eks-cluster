@@ -41,8 +41,12 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.container.command }}
           command: {{ .Values.container.command }}
+          {{- end }}
+          {{- if .Values.container.args }}
           args: {{ .Values.container.args | toJson }}
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}
