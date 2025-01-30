@@ -12,6 +12,11 @@ on:
       DOCKERFILE:
         required: true
         type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
       # IAM_ROLE:
       #   required: true
       #   type: string

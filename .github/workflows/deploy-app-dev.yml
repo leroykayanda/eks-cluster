@@ -12,6 +12,9 @@ jobs:
       REGION: eu-west-1
       DOCKERFILE: demo-app/Dockerfile
       #IAM_ROLE: arn:aws:iam::735265414519:role/github_actions
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy-app-infra:
     uses: ./.github/workflows/deploy-infra.yml

@@ -33,9 +33,12 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
+      # https://breadnet.co.uk/terraform-init-on-github-actions-with-private-modules/
       - name: Terraform Init
-        id: init
-        run: terraform init
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSH_KEY_GITHUB_ACTIONS }}'
+          terraform init
 
       - name: Terraform Validate
         id: validate
