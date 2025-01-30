@@ -78,9 +78,15 @@ resource "aws_route53_record" "keycloak" {
   }
 }
 
+data "aws_lb" "ingress" {
+  count      = var.cluster_created ? 1 : 0
+  name       = "${var.env}-eks-cluster"
+  depends_on = [kubernetes_ingress_v1.keycloak_ingress]
+}
+
 # Keycloak ingress
 
-resource "kubernetes_ingress_v1" "keycloak" {
+resource "kubernetes_ingress_v1" "keycloak_ingress" {
   count = var.cluster_created ? 1 : 0
   metadata {
     name      = "keycloak"
@@ -126,17 +132,19 @@ resource "keycloak_realm" "realm" {
   count      = var.cluster_created ? 1 : 0
   realm      = var.keycloak["realm_name"]
   enabled    = true
-  depends_on = [helm_release.keycloak]
+  depends_on = [kubernetes_ingress_v1.keycloak_ingress]
 }
 
 resource "keycloak_group" "admins" {
-  count    = var.cluster_created ? 1 : 0
-  realm_id = keycloak_realm.realm[0].id
-  name     = "Devops_Admins"
+  count      = var.cluster_created ? 1 : 0
+  realm_id   = keycloak_realm.realm[0].id
+  name       = "Devops_Admins"
+  depends_on = [kubernetes_ingress_v1.keycloak_ingress]
 }
 
 resource "keycloak_group" "software_developers" {
-  count    = var.cluster_created ? 1 : 0
-  realm_id = keycloak_realm.realm[0].id
-  name     = "Software_Developers"
+  count      = var.cluster_created ? 1 : 0
+  realm_id   = keycloak_realm.realm[0].id
+  name       = "Software_Developers"
+  depends_on = [kubernetes_ingress_v1.keycloak_ingress]
 }

@@ -63,13 +63,20 @@ variable "keycloak" {
 
 variable "keycloak_credentials" {
   type        = map(string)
-  description = "Db and keycloak user and password"
+  description = "keycloak user and password"
   default = {
-    "db_name"           = ""
-    "db_user"           = ""
-    "db_password"       = ""
-    "keycloak_user"     = ""
-    "keycloak_password" = ""
+    user     = "value"
+    password = "value"
+  }
+}
+
+variable "keycloak_db_credentials" {
+  type        = map(string)
+  description = "keycloak DB credentials"
+  default = {
+    user     = "value"
+    password = "value"
+    db_name  = "value"
   }
 }
 
@@ -272,4 +279,16 @@ variable "istio" {
     set_up_istio   = false
     kiali_dns_name = null
   }
+}
+
+variable "cluster_upgrade_policy" {
+  type        = string
+  description = "Configuration block for the cluster upgrade policy. Can be STANDARD or EXTENDED"
+  default     = "STANDARD"
+}
+
+variable "cluster_enabled_log_types" {
+  type        = list(string)
+  description = "A list of the desired control plane logs to enable."
+  default     = []
 }

@@ -1,7 +1,7 @@
 region: eu-west-1
 
 podLabels:
-  app: demo-app
+  app: recon-core-backend
 
 service:
   type: NodePort
@@ -9,7 +9,7 @@ service:
 
 readinessProbe:
   httpGet:
-    path: /
+    path: /api/v1/health/
     port: 8000
   initialDelaySeconds: 30
   periodSeconds: 30
@@ -42,4 +42,8 @@ init_container:
   command: ["/bin/sh"]
   args:
     - "-c"
-    - "python manage.py makemigrations --noinput && python manage.py migrate --noinput"
+    - "python manage.py migrate --noinput"
+
+hpa:
+  resource: memory
+  average_utilization: 360

@@ -214,12 +214,6 @@ resource "helm_release" "image_updater" {
   values     = var.argocd_image_updater_values
 }
 
-data "aws_lb" "ingress" {
-  count      = var.cluster_created ? 1 : 0
-  name       = "${var.env}-eks-cluster"
-  depends_on = [kubernetes_ingress_v1.ingress]
-}
-
 # Keycloak
 # https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
 # https://www.youtube.com/watch?v=_72InRW4bdU
@@ -309,7 +303,6 @@ resource "keycloak_generic_protocol_mapper" "groups" {
     "multivalued"               = "true"
   }
 }
-
 
 resource "keycloak_openid_client_default_scopes" "client_default_scopes_argocd" {
   count          = var.cluster_created ? 1 : 0

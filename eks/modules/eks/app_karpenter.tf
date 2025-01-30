@@ -60,7 +60,7 @@ resource "helm_release" "karpenter" {
 
 }
 
-# Create service account
+# Create karpenter service account
 
 resource "aws_iam_role" "karpenter" {
   count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
@@ -153,6 +153,15 @@ resource "kubernetes_service_account" "karpenter" {
   automount_service_account_token = true
 }
 
+# Add karpenter role to EKS access entries to allow karpenter nodes to join cluster
+
+resource "aws_eks_access_entry" "karpenter" {
+  count         = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
+  cluster_name  = var.cluster_name
+  principal_arn = aws_iam_role.karpenter_instance_profile_role[0].arn
+  type          = "EC2_LINUX"
+}
+
 # Setting up a instance profile
 
 resource "aws_iam_role" "karpenter_instance_profile_role" {
@@ -172,21 +181,6 @@ resource "aws_iam_role" "karpenter_instance_profile_role" {
       }
     ]
   })
-}
-
-# Add karpenter role to EKS access entries to allow karpenter nodes to join cluster
-
-resource "aws_eks_access_entry" "karpenter" {
-  count         = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
-  cluster_name  = var.cluster_name
-  principal_arn = aws_iam_role.karpenter_instance_profile_role[0].arn
-  type          = "EC2_LINUX"
-}
-
-resource "aws_iam_instance_profile" "karpenter" {
-  count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
-  name  = "karpenter-instance-profile-${var.env}"
-  role  = aws_iam_role.karpenter_instance_profile_role[0].name
 }
 
 resource "aws_iam_policy" "instance_profile_policy" {
@@ -315,6 +309,12 @@ resource "aws_iam_role_policy_attachment" "ebs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
+resource "aws_iam_instance_profile" "karpenter" {
+  count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
+  name  = "karpenter-instance-profile-${var.env}"
+  role  = aws_iam_role.karpenter_instance_profile_role[0].name
+}
+
 resource "kubectl_manifest" "nodepools" {
   count = var.cluster_created && var.autoscaling_type == "karpenter" ? 1 : 0
 
@@ -346,6 +346,10 @@ spec:
     budgets:
     - nodes: "${var.karpenter["disruption_budget"]}"
 EOF
+
+  depends_on = [
+    helm_release.karpenter
+  ]
 }
 
 resource "kubectl_manifest" "karpenter_node_template" {
@@ -379,6 +383,10 @@ spec:
       volumeType: "gp3"
       deleteOnTermination: true
 EOF
+
+depends_on = [
+  helm_release.karpenter
+]
 }
 
 

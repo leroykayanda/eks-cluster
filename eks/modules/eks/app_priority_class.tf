@@ -27,6 +27,7 @@ EOF
 }
 
 resource "kubectl_manifest" "extra_capacity_deployment" {
+  count     = var.cluster_created ? 1 : 0
   yaml_body = <<EOF
 apiVersion: apps/v1
 kind: Deployment

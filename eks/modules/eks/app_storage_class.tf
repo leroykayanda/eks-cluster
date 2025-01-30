@@ -46,7 +46,8 @@ resource "helm_release" "aws_efs_csi_driver" {
 # Create service account
 
 resource "aws_iam_role" "efs" {
-  name = "${var.cluster_name}-efs-sa-role"
+  count = var.cluster_created ? 1 : 0
+  name  = "${var.cluster_name}-efs-sa-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -63,7 +64,8 @@ resource "aws_iam_role" "efs" {
 }
 
 resource "aws_iam_role_policy_attachment" "efs" {
-  role       = aws_iam_role.efs.name
+  count      = var.cluster_created ? 1 : 0
+  role       = aws_iam_role.efs[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
 }
 
@@ -73,7 +75,7 @@ resource "kubernetes_service_account" "efs" {
     name      = "efs-csi-controller-sa"
     namespace = "kube-system"
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.efs.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.efs[0].arn
     }
   }
   automount_service_account_token = true
@@ -82,6 +84,7 @@ resource "kubernetes_service_account" "efs" {
 # EFS file system
 
 resource "aws_efs_file_system" "efs" {
+  count            = var.cluster_created ? 1 : 0
   creation_token   = "${var.cluster_name}-efs"
   performance_mode = "generalPurpose"
   throughput_mode  = "elastic"
@@ -98,6 +101,7 @@ resource "aws_efs_file_system" "efs" {
 # EFS security group
 
 resource "aws_security_group" "efs" {
+  count       = var.cluster_created ? 1 : 0
   name        = "${var.cluster_name}-efs-sg"
   description = "Allow inbound efs traffic from VPC CIDR"
   vpc_id      = var.vpc_id
@@ -118,9 +122,9 @@ resource "aws_security_group" "efs" {
 
 resource "aws_efs_mount_target" "efs_mount_target" {
   count           = length(var.private_subnets)
-  file_system_id  = aws_efs_file_system.efs.id
+  file_system_id  = aws_efs_file_system.efs[0].id
   subnet_id       = var.private_subnets[count.index]
-  security_groups = [aws_security_group.efs.id]
+  security_groups = [aws_security_group.efs[0].id]
 }
 
 # EFS storage class
@@ -140,9 +144,8 @@ volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Delete
 allowVolumeExpansion: true
 parameters:
-  fileSystemId: "${aws_efs_file_system.efs.id}"
+  fileSystemId: "${aws_efs_file_system.efs[0].id}"
   provisioningMode: efs-ap
   directoryPerms: "777"
 EOF
 }
-

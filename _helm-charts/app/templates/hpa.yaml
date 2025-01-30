@@ -12,10 +12,10 @@ spec:
   metrics:
     - type: Resource
       resource:
-        name: cpu
+        name: {{ .Values.hpa.resource }}
         target:
           type: Utilization
-          averageUtilization: 80
+          averageUtilization: {{ .Values.hpa.average_utilization }}
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300

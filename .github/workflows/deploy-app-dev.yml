@@ -8,14 +8,14 @@ jobs:
   build-app-image:
     uses: ./.github/workflows/build-app.yml
     with:
-      ECR_REPO: dev-demo-app
+      ECR_REPO: staging-demo-app
       REGION: eu-west-1
       DOCKERFILE: demo-app/Dockerfile
-      IAM_ROLE: arn:aws:iam::735265414519:role/github_actions
+      #IAM_ROLE: arn:aws:iam::735265414519:role/github_actions
 
   deploy-app-infra:
     uses: ./.github/workflows/deploy-infra.yml
     with:
-      TERAFORM_WORKSPACE: dev
+      TERAFORM_WORKSPACE: staging
       WORKING_DIRECTORY: demo-app/terraform
     secrets: inherit

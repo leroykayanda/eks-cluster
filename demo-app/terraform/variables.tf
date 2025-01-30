@@ -16,17 +16,11 @@ variable "env" {
   description = "The environment i.e prod, dev etc"
 }
 
-variable "team" {
-  type        = string
-  description = "Used to tag resources"
-  default     = "devops"
-}
-
 variable "sns_topic" {
   type = map(string)
   default = {
-    "dev"  = "arn:aws:sns:eu-west-1:REDACTED:Tell-Developers"
-    "prod" = ""
+    "staging" = "arn:aws:sns:eu-west-1:REDACTED:Tell-Developers"
+    "prod"    = ""
   }
 }
 
@@ -58,15 +52,15 @@ variable "tags" {
 variable "zone_id" {
   type        = string
   description = "Route53 zone to create app dns name in"
-  default     = "Z10421303ISFAWMPOGQET"
+  default     = "Z02331641ZV9FCTVJLHSG"
 }
 
 variable "dns_name" {
   type        = map(string)
   description = "dns name of the app"
   default = {
-    "dev"  = "demo-app.rentrahisi.co.ke"
-    "prod" = ""
+    "staging" = "demo-app.demo.rentrahisi.co.ke"
+    "prod"    = ""
   }
 }
 
@@ -79,16 +73,13 @@ variable "metrics_type" {
 
 variable "kubernetes_cluster_name" {
   type    = string
-  default = "compute"
+  default = "demo"
 }
 
 variable "kubernetes_cluster_env" {
   type = map(string)
   default = {
-    "dev"   = "dev"
-    "stage" = "dev"
-    "sand"  = "dev"
-    "prod"  = "prod"
+    "staging" = "staging"
   }
 }
 
@@ -97,9 +88,9 @@ variable "kubernetes_cluster_env" {
 variable "argo_annotations" {
   type = map(map(string))
   default = {
-    "dev" = {
+    "staging" = {
       "notifications.argoproj.io/subscribe.on-health-degraded.slack" = "rentrahisi"
-      "argocd-image-updater.argoproj.io/image-list"                  = "repo=735265414519.dkr.ecr.eu-west-1.amazonaws.com/dev-demo-app"
+      "argocd-image-updater.argoproj.io/image-list"                  = "repo=521767246022.dkr.ecr.eu-west-1.amazonaws.com/staging-demo-app"
       "argocd-image-updater.argoproj.io/repo.update-strategy"        = "newest-build"
       "argocd-image-updater.argoproj.io/myimage.ignore-tags"         = "latest"
     },
@@ -111,14 +102,14 @@ variable "argo_annotations" {
 variable "argocd" {
   type = any
   default = {
-    "dev" = {
+    "staging" = {
       repo_url        = "git@github.com:leroykayanda/eks-cluster.git"
       target_revision = "1.0.0"
-      path            = "demo-app/helm-charts/app"
-      server          = "dev-argo.rentrahisi.co.ke:443"
+      path            = "_helm-charts/app"
+      server          = "staging-argocd.demo.rentrahisi.co.ke:443"
       value_files = [
         "../demo-app/base-values.yaml",
-        "../demo-app/dev-values.yaml"
+        "../demo-app/staging-values.yaml"
       ]
     }
   }

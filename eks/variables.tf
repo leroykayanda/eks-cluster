@@ -75,7 +75,7 @@ variable "tags" {
 variable "cluster_created" {
   description = "create applications such as argocd only when the eks cluster has already been created"
   default = {
-    "staging"    = false
+    "staging"    = true
     "production" = false
   }
 }

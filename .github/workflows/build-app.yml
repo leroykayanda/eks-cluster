@@ -12,15 +12,15 @@ on:
       DOCKERFILE:
         required: true
         type: string
-      IAM_ROLE:
-        required: true
-        type: string
+      # IAM_ROLE:
+      #   required: true
+      #   type: string
 
 env:
   AWS_REGION: ${{ inputs.REGION }}
   ECR_REPOSITORY: ${{ inputs.ECR_REPO }}
   DOCKERFILE: ${{ inputs.DOCKERFILE }}
-  IAM_ROLE: ${{ inputs.IAM_ROLE }}
+  #IAM_ROLE: ${{ inputs.IAM_ROLE }}
 
 jobs:
   build_app_image:
@@ -34,8 +34,10 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          role-to-assume: ${{ env.IAM_ROLE }}
+          #role-to-assume: ${{ env.IAM_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Login to Amazon ECR
         id: login-ecr

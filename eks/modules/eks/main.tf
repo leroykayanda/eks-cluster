@@ -1,16 +1,16 @@
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.8.3"
-
+  source                                   = "terraform-aws-modules/eks/aws"
+  version                                  = "20.33.0"
   cluster_name                             = var.cluster_name
   cluster_version                          = var.cluster_version
   cluster_endpoint_public_access           = var.cluster_endpoint_public_access
   vpc_id                                   = var.vpc_id
   subnet_ids                               = var.private_subnets
-  authentication_mode                      = "API_AND_CONFIG_MAP"
+  authentication_mode                      = "API"
   cloudwatch_log_group_retention_in_days   = 30
   enable_cluster_creator_admin_permissions = true
   access_entries                           = var.access_entries
+  cluster_enabled_log_types                = var.cluster_enabled_log_types
 
   cluster_addons = {
     coredns = {
@@ -40,6 +40,10 @@ module "eks" {
   eks_managed_node_groups = {
     initial-nodegroup  = var.initial_nodegroup
     critical-nodegroup = var.critical_nodegroup
+  }
+
+  cluster_upgrade_policy = {
+    support_type = var.cluster_upgrade_policy
   }
 
   tags = merge(

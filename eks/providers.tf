@@ -28,3 +28,9 @@ provider "grafana" {
   auth = "${var.grafana_user}:${var.grafana_password}"
 }
 
+provider "keycloak" {
+  client_id = "admin-cli"
+  username  = var.keycloak_credentials["user"]
+  password  = var.keycloak_credentials["password"]
+  url       = var.keycloak[var.env]["url"]
+}

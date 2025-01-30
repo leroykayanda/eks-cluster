@@ -1,7 +1,6 @@
 module "ecr_repo" {
-  source               = "app.terraform.io/RentRahisi/modules/cloud//aws/aws-ecr-repo"
-  version              = "1.0.7"
+  source               = "git@github.com:leroykayanda/terraform-cloud-modules.git//aws/ecr_repo?ref=1.2.37"
   env                  = var.env
-  microservice_name    = var.service
+  service              = var.service
   image_tag_mutability = var.image_tag_mutability
 }
