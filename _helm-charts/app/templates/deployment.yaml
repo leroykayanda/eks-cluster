@@ -32,6 +32,12 @@ spec:
             - secretRef:
                 name: {{ .Values.secretName }}
       {{- end }}
+      nodeSelector:
+        {{- if .Values.use_arm_instances }}
+        beta.kubernetes.io/arch: arm64
+        {{- else }}
+        beta.kubernetes.io/arch: amd64
+        {{- end }}
       containers:
         - name: {{ .Values.container.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

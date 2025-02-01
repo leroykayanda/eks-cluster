@@ -325,7 +325,7 @@ variable "karpenter" {
   default = {
     "staging" = {
       replicas               = 2
-      instance_types         = ["t3.medium", "t3.large", "t3.xlarge"]
+      instance_types         = ["t3.medium", "t3.large", "t3.xlarge", "t4g.medium", "t4g.large", "t4g.xlarge"]
       cpu_limit              = "8"
       memory_limit           = "16Gi"
       disruption_budget      = "50%"

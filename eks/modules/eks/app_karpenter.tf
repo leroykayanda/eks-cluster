@@ -334,6 +334,9 @@ spec:
       - key: karpenter.sh/capacity-type
         operator: In
         values: ["on-demand"]
+      - key: kubernetes.io/arch
+        operator: In
+        values: ["amd64","arm64"]
       - key: node.kubernetes.io/instance-type
         operator: In
         values: ${jsonencode(var.karpenter.instance_types)}
@@ -342,7 +345,7 @@ spec:
     memory: "${var.karpenter["memory_limit"]}"
   disruption:
     consolidationPolicy: WhenUnderutilized
-    expireAfter:         "${var.karpenter["expire_after"]}"
+    expireAfter: "${var.karpenter["expire_after"]}"
     budgets:
     - nodes: "${var.karpenter["disruption_budget"]}"
 EOF

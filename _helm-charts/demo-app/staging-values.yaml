@@ -2,6 +2,7 @@ replicaCount: 1
 minReplicas: 1
 maxReplicas: 2
 secretName: staging-demo-app
+use_arm_instances: true
 
 podAnnotations:
   secret.reloader.stakater.com/reload: staging-demo-app
