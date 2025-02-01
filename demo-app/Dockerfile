@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM --platform=linux/arm64 python:3.8-slim
 WORKDIR /app
 COPY demo-app/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
