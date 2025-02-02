@@ -104,7 +104,7 @@ variable "argocd" {
   default = {
     "staging" = {
       repo_url        = "git@github.com:leroykayanda/eks-cluster.git"
-      target_revision = "1.0.1"
+      target_revision = "1.0.0"
       path            = "_helm-charts/app"
       server          = "staging-argocd.demo.rentrahisi.co.ke:443"
       value_files = [
