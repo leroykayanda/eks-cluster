@@ -334,7 +334,7 @@ spec:
       requirements:
       - key: karpenter.sh/capacity-type
         operator: In
-        values: ["spot"]
+        values: ["on-demand", "spot"]
       - key: kubernetes.io/arch
         operator: In
         values: ["amd64","arm64"]

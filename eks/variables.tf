@@ -328,7 +328,7 @@ variable "karpenter" {
       instance_types         = ["t3.medium", "t3.large", "t3.xlarge", "t4g.medium", "t4g.large", "t4g.xlarge"]
       cpu_limit              = "8"
       memory_limit           = "16Gi"
-      disruption_budget      = "50%"
+      disruption_budget      = "100%"
       disk_size              = "100Gi"
       disk_device_name       = "/dev/xvda"
       karpenter_subnet_key   = "karpenter_can_use"
