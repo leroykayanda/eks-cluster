@@ -106,7 +106,8 @@ resource "aws_iam_policy" "karpenter" {
                 "iam:PassRole",
                 "ssm:GetParameter",
                 "pricing:GetProducts",
-                "iam:GetInstanceProfile"
+                "iam:GetInstanceProfile",
+                "iam:CreateServiceLinkedRole"  
             ],
             "Effect": "Allow",
             "Resource": "*",
@@ -333,7 +334,7 @@ spec:
       requirements:
       - key: karpenter.sh/capacity-type
         operator: In
-        values: ["on-demand"]
+        values: ["spot"]
       - key: kubernetes.io/arch
         operator: In
         values: ["amd64","arm64"]

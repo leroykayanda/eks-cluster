@@ -38,6 +38,11 @@ spec:
         {{- else }}
         beta.kubernetes.io/arch: amd64
         {{- end }}
+        {{- if .Values.use_spot_instances }}
+        karpenter.sh/capacity-type: spot
+        {{- else }}
+        eks.amazonaws.com/capacityType: ON_DEMAND
+        {{- end }}
       containers:
         - name: {{ .Values.container.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
