@@ -126,10 +126,14 @@ We also set up a NodePool ensuring we include instances with GPUs. We apply the 
 
 **References**
 [1] GPU sharing on Amazon EKS with NVIDIA time-slicing and accelerated EC2 instances
-https://aws.amazon.com/blogs/containers/gpu-sharing-on-amazon-eks-with-nvidia-time-slicing-and-accelerated-ec2-instances/
+https://aws.amazon.com/blogs/containers/
+gpu-sharing-on-amazon-eks-with-nvidia-time-slicing-and-accelerated-ec2-instances/
+
 [2] EC2 GPU Instances
 https://docs.aws.amazon.com/dlami/latest/devguide/gpu.html
+
 [3] Recommended GPU Instances
 https://docs.aws.amazon.com/dlami/latest/devguide/gpu.html
+
 [4] Amazon EKS- implementing and using GPU nodes with NVIDIA drivers
 https://marcincuber.medium.com/amazon-eks-implementing-and-using-gpu-nodes-with-nvidia-drivers-08d50fd637fe
