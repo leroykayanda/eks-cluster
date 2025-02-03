@@ -125,6 +125,7 @@ We also set up a NodePool ensuring we include instances with GPUs. We apply the 
         expireAfter: 1440h
 
 **References**
+
 [1] GPU sharing on Amazon EKS with NVIDIA time-slicing and accelerated EC2 instances
 https://aws.amazon.com/blogs/containers/
 gpu-sharing-on-amazon-eks-with-nvidia-time-slicing-and-accelerated-ec2-instances/
