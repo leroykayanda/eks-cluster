@@ -84,7 +84,6 @@ resource "kubernetes_service_account" "efs" {
 # EFS file system
 
 resource "aws_efs_file_system" "efs" {
-  count            = var.cluster_created ? 1 : 0
   creation_token   = "${var.cluster_name}-efs"
   performance_mode = "generalPurpose"
   throughput_mode  = "elastic"
@@ -101,7 +100,6 @@ resource "aws_efs_file_system" "efs" {
 # EFS security group
 
 resource "aws_security_group" "efs" {
-  count       = var.cluster_created ? 1 : 0
   name        = "${var.cluster_name}-efs-sg"
   description = "Allow inbound efs traffic from VPC CIDR"
   vpc_id      = var.vpc_id
@@ -122,9 +120,9 @@ resource "aws_security_group" "efs" {
 
 resource "aws_efs_mount_target" "efs_mount_target" {
   count           = length(var.private_subnets)
-  file_system_id  = aws_efs_file_system.efs[0].id
+  file_system_id  = aws_efs_file_system.efs.id
   subnet_id       = var.private_subnets[count.index]
-  security_groups = [aws_security_group.efs[0].id]
+  security_groups = [aws_security_group.efs.id]
 }
 
 # EFS storage class
@@ -144,7 +142,7 @@ volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Delete
 allowVolumeExpansion: true
 parameters:
-  fileSystemId: "${aws_efs_file_system.efs[0].id}"
+  fileSystemId: "${aws_efs_file_system.efs.id}"
   provisioningMode: efs-ap
   directoryPerms: "777"
 EOF
