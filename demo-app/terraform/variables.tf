@@ -29,6 +29,12 @@ variable "image_tag_mutability" {
   default = "MUTABLE"
 }
 
+variable "images_to_keep" {
+  type        = number
+  description = "How many images will be kept by the lifecycle policy"
+  default     = 50
+}
+
 variable "app_secrets" {
   default = {
     FOO = "BAR"
