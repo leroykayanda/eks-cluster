@@ -37,10 +37,15 @@ cmds
 - Comment all the contents of these files.
 
 app_elk.tf
+
 app_grafana.tf
+
 app_grafana_alerts.tf
+
 app_istio.tf
+
 app_keycloak.tf
+
 app_argocd.tf
 
 - Run terraform apply. This will delete terraform applications such as argocd
