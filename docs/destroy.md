@@ -48,6 +48,8 @@ app_keycloak.tf
 
 app_argocd.tf
 
+app_load_balancer_controller.tf
+
 - Run terraform apply. This will delete terraform applications such as argocd
 - Delete the database in console because it has lifecycle.prevent_destroy set.
 - Run terraform apply -destroy
