@@ -54,21 +54,28 @@ AWS secrets manager secret
 - If creating the resources one by one, follow this order.
 
 SecretStore
+
 ExternalSecret
+
 Deployment
+
 Service
+
 HPA
+
 Ingress
 
 **Helm Cmds**
 
 ```
-helm install --dry-run demo-app app -f demo-app/base-values.yaml -f demo-app/staging-values.yaml
-helm install demo-app app -f demo-app/base-values.yaml -f demo-app/staging-values.yaml -n demo-app
-helm uninstall demo-app -n demo-app
+svc=demo-app
+ns=demo-app
+helm install --dry-run $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml
+helm install $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
+helm uninstall $svc -n $ns
 
-helm upgrade --dry-run demo-app app -f demo-app/base-values.yaml -f demo-app/staging-values.yaml -n demo-app -n demo-app
-helm upgrade demo-app app -f demo-app/base-values.yaml -f demo-app/staging-values.yaml -n demo-app -n demo-app
+helm upgrade --dry-run demo-app $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
+helm upgrade $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
 ```
 
 - Delete the helm chart using helm uninstall
