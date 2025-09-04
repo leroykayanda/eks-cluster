@@ -74,7 +74,7 @@ helm install --dry-run $svc app -f $svc/base-values.yaml -f $svc/staging-values.
 helm install $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
 helm uninstall $svc -n $ns
 
-helm upgrade --dry-run demo-app $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
+helm upgrade --dry-run $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
 helm upgrade $svc app -f $svc/base-values.yaml -f $svc/staging-values.yaml -n $ns
 ```
 
